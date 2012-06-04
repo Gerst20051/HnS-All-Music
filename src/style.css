@@ -1,24 +1,24 @@
 * {
--moz-user-select:none;
 -khtml-user-select:none;
--webkit-user-select:none;
+-moz-user-select:none;
 -o-user-select:none;
+-webkit-user-select:none;
 user-select:none;
 }
 
 body {
 background:#333332;
-overflow:hidden;
+color:#fff;
 font-family:HelveticaNeue,Helvetica,"lucida grande",tahoma,Verdana,Arial;
-color:white;
 font-size:12px;
 margin:0;
+overflow:hidden;
 }
 
 ul {
+list-style-type:none;
 margin:0;
 padding:0;
-list-style-type:none;
 }
 
 .clickable {
@@ -27,29 +27,29 @@ cursor:pointer;
 
 .ellipsis {
 overflow:hidden;
-text-overflow:ellipsis;
 -o-text-overflow:ellipsis;
+text-overflow:ellipsis;
 white-space:nowrap;
 }
 
 #outerWidgetContainer {
-position:absolute;
-left:0;
-top:0;
-right:0;
 bottom:0;
+left:0;
+right:0;
+top:0;
 overflow:hidden;
+position:absolute;
 }
 
 #widgetContainer {
+cursor:default;
+filter:alpha(opacity=0);
+left:330px;
+-moz-opacity:0;
+opacity:0;
+opacity:1; /* fade in */
 position:absolute;
 top:0;
-opacity:0;
--moz-opacity:0;
-filter:alpha(opacity=0);
-cursor:default;
-left:330px;
-opacity:1; /* fade in */
 }
 
 #notifBar {
@@ -59,7 +59,7 @@ position:absolute;
 z-index:20;
 text-align:center;
 background-image:url(i/overlayBg.png);
-color:white;
+color:#fff;
 top:-80px;
 font-family:Helvetica,"lucida grande",tahoma,Verdana,Arial;
 font-size:11px;
@@ -457,9 +457,12 @@ border-bottom-left-radius:1px;
 border-bottom-right-radius:1px;
 -moz-border-radius-bottomright:1px;
 -webkit-border-bottom-right-radius:1px;
+margin-left:1px; /* when skip-back is visible */
+width:431px; /* when skip-back is visible -16px */
 }
 
 .player .meta .progress-bar-container .controls .buffer .seeker {
+width:0;
 width:332px;
 height:5px;
 background-image:url(i/seeker.png);
