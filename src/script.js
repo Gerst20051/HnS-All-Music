@@ -19,20 +19,49 @@
 aC = {
 playlist: [],
 loadPlaylist: function(){
-	var list = [];
 	if (aC.playlist.length == 0) console.log('Playlist is empty');
-	$.each(aC.playlist, function(i,v){
-		list.push($("<li/>").text(v)[0]);
-	});
-	$("#content").html(list);
+	else {
+		var list = [];
+		$.each(aC.playlist, function(i,v){
+			list.push($("<li/>").text(v)[0]);
+		});
+		$("#content").html(list);
+		$("#mainContainer").jScrollPane();
+	}
+},
+showNotificationBar: function(a){
+	$("#notifBar #message")[0].innerHTML = a;
+	$("#notifBar").animate({top: 0}, "fast");
+},
+hideNotificationBar: function(){
+	$("#notifBar").animate({top: -80}, "fast");
 }
 };
 
 $(document).ready(function(){
 	$.getJSON("playlist.json", function(a){
-		if ($.isArray(a.data)) aC.playlist = a.data;
-		else console.log("Error loading playlist");
-		aC.loadPlaylist();
+		if ($.isArray(a.data)) {
+			aC.playlist = a.data;
+			aC.loadPlaylist();
+		} else console.log("Error loading playlist");
+	});
+	$("#notifBar .notifCloseButton").click(function(){
+		hideNotificationBar();
+	});
+	$("#widgetContainer").hover(function(){
+		$(".player .meta .titles").animate({
+			width: $(".player").width() - $('.player').outerHeight() - 8 - $(".right-bar-buttons").width() - 8
+		}, 100)
+	}, function(){
+		$(".player .meta .titles").animate({
+			width: $(".player").width() - $('.player').outerHeight() - 8 - 8 - 19
+		}, 100)
+	});
+	$(".player .album-art-container").click(function(a){
+		alert("Trigger Play Pause");
+	});
+	$(".item").click(function(b){
+		alert("Trigger Play Pause");
 	});
 });
 })();
