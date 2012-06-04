@@ -1,3 +1,11 @@
+* {
+-moz-user-select: none;
+-khtml-user-select: none;
+-webkit-user-select: none;
+-o-user-select: none;
+user-select: none;
+}
+
 body {
 background: #333332;
 overflow: hidden;
@@ -185,19 +193,39 @@ background-position: -30px 0;
 }
 
 .player.music-playing .album-art-container .album-art .play-pause-btn {
-background-position: -60px -0px;
+background-position: -60px 0;
 }
 
 .player.music-playing .album-art-container .album-art:hover .play-pause-btn {
-background-position: -90px -0px;
+background-position: -90px 0;
 }
 
-.engage .player.music-playing .album-art-container .album-art .play-pause-btn {
-background-position: -153px -0px;
+.player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+background-position: -90px 0;
 }
 
 .engage .player.music-playing .album-art-container .album-art:hover .play-pause-btn {
-background-position: -204px -0px;
+background-position: -204px 0;
+}
+
+.engage .player.music-playing .album-art-container .album-art:active .play-pause-btn {
+background-position: -255px 0;
+}
+
+.engage .player.music-paused .album-art-container .album-art:hover .play-pause-btn {
+background-position: -51px 0;
+}
+
+.engage .player.music-paused .album-art-container .album-art:active .play-pause-btn {
+background-position: -102px 0;
+}
+
+.engage .player.music-playing .album-art-container .album-art .play-pause-btn {
+background-position: -153px 0;
+}
+
+.engage .player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+background-position: -204px 0;
 }
 
 .player .divider {
@@ -300,8 +328,22 @@ background-repeat: no-repeat;
 background-position: 0 0;
 }
 
+.player .meta .right-bar-buttons .action-buttons-container .embed:hover {
+background-position: -22px 0;
+}
+
+.player .meta .right-bar-buttons .action-buttons-container .embed:active {
+background-position: -44px 0;
+}
+
 .player .meta .right-bar-buttons .action-buttons-container .list {
 border-left: 1px solid #000;
+border-top-right-radius: 2px;
+-moz-border-radius-topright: 2px;
+-webkit-border-top-right-radius: 2px;
+border-bottom-right-radius: 2px;
+-moz-border-radius-bottomright: 2px;
+-webkit-border-bottom-right-radius: 2px;
 cursor: pointer;
 background-image: url(https://d2b1xqaw2ss8na.cloudfront.net/static/img/actionbuttons.png);
 background-repeat: no-repeat;
@@ -309,17 +351,24 @@ background-position: -66px 0;
 float: left;
 }
 
-.player .meta .right-bar-buttons .action-buttons-container .list {
-border-top-right-radius: 2px;
--moz-border-radius-topright: 2px;
--webkit-border-top-right-radius: 2px;
-border-bottom-right-radius: 2px;
--moz-border-radius-bottomright: 2px;
--webkit-border-bottom-right-radius: 2px;
+.player .meta .right-bar-buttons .action-buttons-container .list:hover {
+background-position: -88px 0;
+}
+
+.player .meta .right-bar-buttons .action-buttons-container .list:active {
+background-position: -110px 0;
 }
 
 .engage .player .meta .right-bar-buttons .action-buttons-container .list {
 background-position: -132px 0;
+}
+
+.engage .player .meta .right-bar-buttons .action-buttons-container .list:hover {
+background-position: -154px 0;
+}
+
+.engage .player .meta .right-bar-buttons .action-buttons-container .list:active {
+background-position: -176px 0;
 }
 
 .player .meta .progress-bar-container {
@@ -352,6 +401,20 @@ display: none;
 .playlist .player.music-paused .controls,
 .trackset .player.music-paused .controls {
 display: none;
+}
+
+.album #widgetContainer:hover .player.music-paused .context-title,
+.toplist-track #widgetContainer:hover .player.music-paused .context-title,
+.playlist #widgetContainer:hover .player.music-paused .context-title,
+.trackset #widgetContainer:hover .player.music-paused .context-title {
+display: none
+}
+
+.album #widgetContainer:hover .player.music-paused .controls,
+.toplist-track #widgetContainer:hover .player.music-paused .controls,
+.playlist #widgetContainer:hover .player.music-paused .controls,
+.trackset #widgetContainer:hover .player.music-paused .controls {
+display: block
 }
 
 .player .meta .progress-bar-container .controls .skip-back {
@@ -412,6 +475,10 @@ height: 16px;
 background-image: url(https://d2b1xqaw2ss8na.cloudfront.net/static/img/skipbtns.png);
 background-position: -40px 0;
 margin-top: 1px;
+}
+
+.player .meta .progress-bar-container .controls .skip-fwd:hover {
+background-position: -60px 0;
 }
 
 .player .meta .progress-bar-container .controls .time-spent {
@@ -479,6 +546,7 @@ border-bottom-left-radius: 3px;
 border-bottom-right-radius: 3px;
 -moz-border-radius-bottomright: 3px;
 -webkit-border-bottom-right-radius: 3px;
+outline:0;
 }
 
 #mainContainer .content {
@@ -500,6 +568,18 @@ transition-property: background-color;
 -webkit-transition-duration: .4s;
 -o-transition-duration: .4s;
 transition-duration: .4s;
+}
+
+.item:hover {
+background-color: #373737;
+-moz-transition-property: background-color;
+-webkit-transition-property: background-color;
+-o-transition-property: background-color;
+transition-property: background-color;
+-moz-transition-duration: .1s;
+-webkit-transition-duration: .1s;
+-o-transition-duration: .1s;
+transition-duration: .1s
 }
 
 .ppbtn {
