@@ -3,6 +3,7 @@
 <head>
 <title>HnS All Music</title>
 <meta name="description" content="HnS All Music is a playlist based music listening and discovery engine.">
+<link type="text/css" rel="stylesheet" href="style.css"/>
 <script src="http://code.jquery.com/jquery.min.js"></script>
 <script src="mousewheel.js"></script>
 <script src="jscrollpane.js"></script>
@@ -671,7 +672,8 @@ filter: alpha(opacity=55);
 }
 
 /* Scrollbar Style */
-.jspContainer{overflow:hidden;position:relative}.jspPane{position:absolute}
+.jspContainer{overflow:hidden;position:relative}
+.jspPane{position:absolute}
 .jspVerticalBar{position:absolute;top:0;right:0;width:7px;height:100%;z-index:1}
 .jspHorizontalBar{position:absolute;bottom:0;left:0;width:100%;height:16px;background:red}
 .jspVerticalBar *,.jspHorizontalBar *{margin:0;padding:0}
@@ -679,10 +681,8 @@ filter: alpha(opacity=55);
 .jspHorizontalBar .jspCap{float:left}
 .jspTrack{background:rgba(0,0,0,0.15);position:relative;border-bottom-right-radius:1px;-moz-border-radius-bottomright:1px;-webkit-border-bottom-right-radius:1px}
 .jspDrag{background:#6e6e6e;position:relative;top:0;left:0;cursor:pointer;opacity:0;-moz-opacity:0;filter:alpha(opacity=0);border-top-left-radius:3px;-moz-border-radius-topleft:3px;-webkit-border-top-left-radius:3px;border-top-right-radius:3px;-moz-border-radius-topright:3px;-webkit-border-top-right-radius:3px;border-bottom-left-radius:3px;-moz-border-radius-bottomleft:3px;-webkit-border-bottom-left-radius:3px;border-bottom-right-radius:3px;-moz-border-radius-bottomright:3px;-webkit-border-bottom-right-radius:3px;-moz-transition-property:opacity;-webkit-transition-property:opacity;-o-transition-property:opacity;transition-property:opacity;-moz-transition-duration:.4s;-webkit-transition-duration:.4s;-o-transition-duration:.4s;transition-duration:.4s}
-.white .jspDrag{background:#a1a1a1}
 #mainContainer:hover .jspDrag{opacity:1;-moz-opacity:1;filter:alpha(opacity=100);-moz-transition-property:opacity;-webkit-transition-property:opacity;-o-transition-property:opacity;transition-property:opacity;-moz-transition-duration:.1s;-webkit-transition-duration:.1s;-o-transition-duration:.1s;transition-duration:.1s}
 .jspDrag:hover{background-color:#a1a1a1}
-.white .jspDrag:hover{background-color:#6e6e6e}
 .jspHorizontalBar .jspTrack,
 .jspHorizontalBar .jspDrag{float:left;height:100%}
 .jspArrow{background:#50506d;text-indent:-20000px;display:block;cursor:pointer}
@@ -737,9 +737,7 @@ filter: alpha(opacity=55);
 </div>
 <div class="logo clickable"></div>
 </div>
-<div id="mainContainer" class="main-container jspScrollable" style="height:618px;overflow:hidden;padding:0;width:618px;" tabindex="0">
-<div class="jspContainer" style="height:618px;width:618px">
-<div class="jspPane" style="padding:0;top:-0;width:607px">
+<div id="mainContainer" style="height:618px;overflow:hidden;padding:0;width:618px;" tabindex="0">
 <ul id="content" class="content">
 		<li class="track-1tJkic0TURTCXw3rBhYgWu music-paused item playlist" rel="track" data-track="1tJkic0TURTCXw3rBhYgWu" data-duration="2:56" data-duration-ms="175560" data-index="0" data-ca="https://d3rt1990lpmkn.cloudfront.net/640/7ffb12fee5be4cbe8bb450804442b2e4a98d1705" style="width: 618px; ">
 	<div class="ppbtn"></div>
@@ -1444,15 +1442,7 @@ filter: alpha(opacity=55);
 </li>
 </ul>
 </div>
-<div class="jspVerticalBar">
-<div class="jspCap jspCapTop"></div>
-<div class="jspTrack" style="height:618px">
-<div class="jspDrag" style="height:9px;top:0">
-<div class="jspDragTop"></div>
-<div class="jspDragBottom"></div></div>
-</div>
-<div class="jspCap jspCapBottom"></div>
-</div></div></div>
+</div></div>
 <div id="engageView" class="music-paused" style="width: 618px; height: 618px; " rel="2aEEz00K5NMIEsHtpawVVg">
 	<div class="shelf" style="bottom: 80px; height: 538px; "></div>
 	<div class="scroller">

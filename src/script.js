@@ -88,8 +88,7 @@ function getTrackId(b){
 }
 
 $(document).ready(function(){
-	//$("#mainContainer").jScrollPane();
-	$(".jspPane").jScrollPane();
+	$("#mainContainer").jScrollPane();
 });
 
 $(".player .album-art-container").click(function(b){
