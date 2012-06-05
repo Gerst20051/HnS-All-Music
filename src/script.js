@@ -25,8 +25,8 @@ aC = {
 playlist: [],
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
-		$(".player .album-art .art").attr('src',playlist[0].img);
-		$(".player .meta .titles").find(".track-name").text(playlist[0].track).end().find(".artist-name").text(playlist[0].artist);
+		$(".player .album-art .art").attr('src',playlist[0].img).setData({index:0});
+		$(".player .meta .titles").find(".track-name").text(playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
@@ -37,14 +37,23 @@ loadPlaylist: function(playlist){
 			}
 		});
 		$("#content").html(list);
-		$("#mainContainer").jScrollPane();
+		$("#mainContainer").jScrollPane({showArrows:true});
 		$(".jspPane").width($(".jspContainer").width());
+		/*
+		$(".aup").live('click',function(){
+			$('.jspScrollable').data('jsp').scrollByY(-1000);
+		});
+		$(".jspArrowDown").live('click',function(){
+			$('.jspScrollable').data('jsp').scrollByY(1000);
+		});
+		*/
 	} else console.log('Playlist is empty');
 },
 checkPlaylist: function(){
 	if (sls()) {
 		if (localStorage.getItem('playlist')){
 			aC.playlist = $.parseJSON(localStorage.getItem('playlist'));
+			aC.loadPlaylist(aC.playlist);
 		}
 	}
 	$.getJSON("playlist.json", function(a){
@@ -61,16 +70,15 @@ niceDuration: function(a){
 	return 10 > b ? a + ":0" + b : a + ":" + b;
 },
 setDimensions: function(){
-	/* How to calculate left position of #widgetContainer based on screen size? */
-	/* How to calculate height of #mainContainer based on screen size? Width of .player, #mainContainer, and .jspContainer is based off of this height */
-	/* When we set the width and height of mainContainer also set the width of .jspPane height is 11px less than #mainContainer */
-	/* When we set the height of #mainContainer also set the height of .jspTrack */
-	
-	/* Why choose dimensions of 618px when screen dimensions are availHeight: 760px, availWidth: 1280px */
-	/* Available screen height = 699px Diff = 61px */
-	/* Player height is 78px + 2px for border (760 - 80 = 680) Diff = 62 */
-	var height = $(window).height(), width = $(window).width();
-	
+	var w = $(window), height = w.height()/* 699 */, width = w.width()/* 1280 */;
+	var dimension = height - $(".player").outerHeight();
+	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(dimension).add(".player").width(dimension);
+	if (dimension < width) {
+		$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
+		
+	} else {
+		$("").width(width);
+	}
 },
 showNotificationBar: function(a){
 	$("#notifBar #message")[0].html(a);
@@ -78,6 +86,26 @@ showNotificationBar: function(a){
 },
 hideNotificationBar: function(){
 	$("#notifBar").animate({top: -80}, "fast");
+},
+triggerPlayPause: function(a){ /* Pass Index */
+	$(".player .meta .controls .time-spent").text("0:00");
+	aC.hideNotificationBar();
+	
+	
+	
+	/*
+	var clickedTrack = a;
+	setTimeout(function(){
+		if (clickedTrack) {
+			clickedTrack.attr("class", clickedTrack.attr("class") + " loading");
+			setTimeout(function(){
+				clickedTrack && clickedTrack.removeClass("loading")
+			}, 6E4);
+		}
+	}, 300);
+	playPauseTrack(a.attr("data-track"), a.attr("rel"), context);
+	return !1
+	*/
 }
 };
 })();
@@ -97,13 +125,23 @@ $(document).ready(function(){
 			width: $(".player").width() - $('.player').outerHeight() - 8 - 8 - 19
 		}, 100)
 	});
-	$(".player .album-art-container").live('click',function(a){
-		alert("Trigger Play Pause");
+	$(".player .meta .titles .track-name").live('click',function(){
+		console.log($(this).data('index')+1);
+		
 	});
-	$("#content").on('click','.i',function(b){
-		console.log($(this).data());
-		$(".player .meta .controls .time-spent").text("0:00");
-		alert("Trigger Play Pause");
+	$(".player .album-art-container").live('click',function(a){
+		console.log('data',$(this).data());
+		aC.triggerPlayPause($("#content .l").eq($(this).parent().attr("rel")), a);
+	});
+	$("#content").on('click','.i',function(a){
+		console.log('data',$(this).data());
+		aC.triggerPlayPause($(this), a);
+	});
+	
+	$("#mainContainer").hover(function(e){
+		var x = e.pageX - this.offsetLeft;
+		var y = e.pageY - this.offsetTop;
+		console.log(x +', '+ y);
 	});
 });
 
