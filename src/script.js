@@ -19,25 +19,19 @@ $.fn.setData = function(obj){
 (function(){
 aC = {
 playlist: [],
-loadPlaylist: function(){
-	if (aC.playlist.length > 0) {
+loadPlaylist: function(playlist){
+	if (playlist.length > 0) {
+		$(".player .album-art .art").attr('src',playlist[0].img);
+		$(".player .meta .titles").find(".track-name").text(playlist[0].track).end().find(".artist-name").text(playlist[0].artist);
 		var list = [];
-		$.each(aC.playlist, function(i,v){
+		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
 				var html = $("<div/>").attr('class','ppbtn'),
 					itemlist = $("<ul/>").attr('class','track-info'),
 					item = $('<li class="duration">'+aC.niceDuration(v.duration)+'</li><li class="track-title">'+(i+1)+'. '+v.track+'</li><li class="artist">'+v.artist+'</li>');
-				list.push($("<li/>").attr('class','music-paused item playlist').setData(v).html(html).append(itemlist.append(item))[0]);
-			} else {
-				var name = v.split(" - ");
-				var html = $("<ul/>").attr('class','ppbtn'),
-					itemlist = $("<ul/>").attr('class','track-info'),
-					item = $('<li class="duration"></li><li class="track-title">'+(i+1)+'. '+name[0]+'</li><li class="artist">'+name[1]+'</li>');
-				list.push($("<li/>").attr('class','music-paused item playlist').html(html).append(itemlist.append(item))[0]);
+				list.push($("<li/>").attr('class','off i p').setData(v).html(html).append(itemlist.append(item))[0]);
 			}
 		});
-		$(".player .album-art .art").attr('src',aC.playlist[0].img);
-		$(".player .meta .titles").find(".track-name").text(aC.playlist[0].track).end().find(".artist-name").text(aC.playlist[0].artist);
 		$("#content").html(list);
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
@@ -68,13 +62,14 @@ hideNotificationBar: function(){
 	$("#notifBar").animate({top: -80}, "fast");
 }
 };
+})();
 
 $(document).ready(function(){
 	aC.setDimensions();
 	$.getJSON("playlist.json", function(a){
 		if ($.isArray(a.data)) {
 			aC.playlist = a.data;
-			aC.loadPlaylist();
+			aC.loadPlaylist(aC.playlist);
 		} else console.log("Error loading playlist");
 	});
 	$("#notifBar .notifCloseButton").live('click',function(){
@@ -92,9 +87,74 @@ $(document).ready(function(){
 	$(".player .album-art-container").live('click',function(a){
 		alert("Trigger Play Pause");
 	});
-	$("#content").on('click','.item',function(b){
+	$("#content").on('click','.i',function(b){
 		console.log($(this).data());
+		$(".player .meta .controls .time-spent").text("0:00");
 		alert("Trigger Play Pause");
 	});
 });
-})();
+
+tfObjSort={
+	init:function(){
+		Array.prototype.objSort=function(){
+			tfObjSort.setThings(this);
+			var a=arguments;
+			var x=tfObjSort;
+			x.a=[];x.d=[];
+			for(var i=0;i<a.length;i++){
+				if(typeof a[i]=="string"){x.a.push(a[i]);x.d.push(1)};
+				if(a[i]===-1){x.d[x.d.length-1]=-1}
+			}
+			return this.sort(tfObjSort.sorter);
+		};
+		Array.prototype.strSort=function(){
+			tfObjSort.setThings(this);
+			return this.sort(tfObjSort.charSorter)
+		}
+	},
+	sorter:function(x,y){
+		var a=tfObjSort.a
+		var d=tfObjSort.d
+		var r=0
+		for(var i=0;i<a.length;i++){
+			if(typeof x+typeof y!="objectobject"){return typeof x=="object"?-1:1};
+			var m=x[a[i]]; var n=y[a[i]];
+			var t=typeof m+typeof n;
+			if(t=="booleanboolean"){m*=-1;n*=-1}
+			else if(t.split("string").join("").split("number").join("")!=""){continue};
+			r=m-n;
+			if(isNaN(r)){r=tfObjSort.charSorter(m,n)};
+			if(r!=0){return r*d[i]}
+		}
+		return r
+	},
+	charSorter:function(x,y){
+		if(tfObjSort.ignoreCase){x=x.toLowerCase();y=y.toLowerCase()};
+		var s=tfObjSort.chars;
+		if(!s){return x>y?1:x<y?-1:0};
+		x=x.split("");y=y.split("");l=x.length>y.length?y.length:x.length;
+		var p=0;
+		for(var i=0;i<l;i++){
+			p=s.indexOf(x[i])-s.indexOf(y[i]);
+			if(p!=0){break};
+		};
+		if(p==0){p=x.length-y.length};
+		return p
+	},
+	setThings:function(x){
+		this.ignoreCase=x.sortIgnoreCase;
+		var s=x.sortCharOrder;
+		if(!s){this.chars=false;return true};
+		if(!s.sort){s=s.split(",")};
+		var a="";
+		for(var i=1;i<1024;i++){a+=String.fromCharCode(i)};
+		for(var i=0;i<s.length;i++){
+			z=s[i].split("");
+			var m=z[0]; var n=z[1]; var o="";
+			if(z[2]=="_"){o=n+m} else {o=m+n};
+			a=a.split(m).join("").split(n).join(o);
+		};
+		this.chars=a
+	}
+};
+tfObjSort.init();

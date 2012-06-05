@@ -189,47 +189,47 @@ background-repeat:no-repeat;
 background-image:url(i/PlayPause.png);
 }
 
-.player.music-paused .album-art-container .album-art .play-pause-btn {
+.player.off .album-art-container .album-art .play-pause-btn {
 background-position:0 0;
 }
 
-.player.music-paused .album-art-container .album-art:hover .play-pause-btn {
+.player.off .album-art-container .album-art:hover .play-pause-btn {
 background-position:-30px 0;
 }
 
-.player.music-playing .album-art-container .album-art .play-pause-btn {
+.player.on .album-art-container .album-art .play-pause-btn {
 background-position:-60px 0;
 }
 
-.player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+.player.on .album-art-container .album-art:hover .play-pause-btn {
 background-position:-90px 0;
 }
 
-.player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+.player.on .album-art-container .album-art:hover .play-pause-btn {
 background-position:-90px 0;
 }
 
-.engage .player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+.engage .player.on .album-art-container .album-art:hover .play-pause-btn {
 background-position:-204px 0;
 }
 
-.engage .player.music-playing .album-art-container .album-art:active .play-pause-btn {
+.engage .player.on .album-art-container .album-art:active .play-pause-btn {
 background-position:-255px 0;
 }
 
-.engage .player.music-paused .album-art-container .album-art:hover .play-pause-btn {
+.engage .player.off .album-art-container .album-art:hover .play-pause-btn {
 background-position:-51px 0;
 }
 
-.engage .player.music-paused .album-art-container .album-art:active .play-pause-btn {
+.engage .player.off .album-art-container .album-art:active .play-pause-btn {
 background-position:-102px 0;
 }
 
-.engage .player.music-playing .album-art-container .album-art .play-pause-btn {
+.engage .player.on .album-art-container .album-art .play-pause-btn {
 background-position:-153px 0;
 }
 
-.engage .player.music-playing .album-art-container .album-art:hover .play-pause-btn {
+.engage .player.on .album-art-container .album-art:hover .play-pause-btn {
 background-position:-204px 0;
 }
 
@@ -401,30 +401,20 @@ border-bottom-right-radius:1px;
 -webkit-border-bottom-right-radius:1px;
 }
 
-.track .player .meta .progress-bar-container .context-title,
-.player.music-playing .meta .progress-bar-container .context-title {
+.player.on .meta .progress-bar-container .context-title {
 display:none;
 }
 
-.album .player.music-paused .controls,
-.toplist-track .player.music-paused .controls,
-.playlist .player.music-paused .controls,
-.trackset .player.music-paused .controls {
+.p .player.off .controls {
 display:none;
 }
 
-.album #widgetContainer:hover .player.music-paused .context-title,
-.toplist-track #widgetContainer:hover .player.music-paused .context-title,
-.playlist #widgetContainer:hover .player.music-paused .context-title,
-.trackset #widgetContainer:hover .player.music-paused .context-title {
-display:none
+.p #widgetContainer:hover .player.off .context-title {
+display:none;
 }
 
-.album #widgetContainer:hover .player.music-paused .controls,
-.toplist-track #widgetContainer:hover .player.music-paused .controls,
-.playlist #widgetContainer:hover .player.music-paused .controls,
-.trackset #widgetContainer:hover .player.music-paused .controls {
-display:block
+.p #widgetContainer:hover .player.off .controls {
+display:block;
 }
 
 .player .meta .progress-bar-container .controls .skip-back {
@@ -460,6 +450,10 @@ border-bottom-left-radius:1px;
 border-bottom-right-radius:1px;
 -moz-border-radius-bottomright:1px;
 -webkit-border-bottom-right-radius:1px;
+
+}
+
+.on.player .meta .progress-bar-container .controls .buffer {
 margin-left:1px; /* when skip-back is visible */
 width:431px; /* when skip-back is visible -16px */
 }
@@ -516,12 +510,7 @@ text-shadow:#000 0 1px 1px;
 margin-right:4px;
 }
 
-.album .player .meta .progress-bar-container .context-title .type-icon {
-background-position:0 0;
-}
-
-.playlist .player .meta .progress-bar-container .context-title .type-icon,
-.trackset .player .meta .progress-bar-container .context-title .type-icon {
+.p .player .meta .progress-bar-container .context-title .type-icon {
 background-position:-11px 0;
 }
 
@@ -573,7 +562,7 @@ width:618px;
 z-index:2;
 }
 
-.item {
+.i {
 height:35px;
 padding:0;
 border-top:1px solid #3c3c3c;
@@ -591,7 +580,7 @@ transition-duration:.4s;
 position:relative;
 }
 
-.item:hover {
+.i:hover {
 background-color:#373737;
 -moz-transition-property:background-color;
 -webkit-transition-property:background-color;
@@ -616,19 +605,19 @@ background-image:url(i/ListPlayPause.png);
 float:left;
 }
 
-.music-paused .ppbtn {
+.off .ppbtn {
 background-position:0 0;
 }
 
-.music-paused:hover .ppbtn {
+.off:hover .ppbtn {
 background-position:-25px 0;
 }
 
-.music-playing .ppbtn {
+.on .ppbtn {
 background-position:-50px -0px;
 }
 
-.music-playing:hover .ppbtn {
+.on:hover .ppbtn {
 background-position:-75px -0px;
 }
 
@@ -802,11 +791,11 @@ left:33px;
 left:-33px;
 }
 
-.playlist #engageView .fixed {
+.p #engageView .fixed {
 -webkit-box-reflect:below -1px -webkit-gradient(linear,left top,left bottom,from(transparent),color-stop(0.9,transparent),to(rgba(255,255,255,0.1)));
 }
 
-.playlist #engageView .album-art {
+.p #engageView .album-art {
 border:1px solid #000;
 }
 
