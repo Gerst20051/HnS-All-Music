@@ -19,11 +19,6 @@ $.fn.setData = function(obj){
 (function(){
 aC = {
 playlist: [],
-setData: function(obj){
-	for (key in json){
-		$('body').data(key, json[key])
-	}
-},
 loadPlaylist: function(){
 	if (aC.playlist.length > 0) {
 		var list = [];
@@ -31,13 +26,13 @@ loadPlaylist: function(){
 			if (typeof v == "object") {
 				var html = $("<div/>").attr('class','ppbtn'),
 					itemlist = $("<ul/>").attr('class','track-info'),
-					item = $('<li class="duration">'+aC.niceDuration(v.duration)+'</li><li class="track-title">'+v.track+'</li><li class="artist">'+v.artist+'</li>');
+					item = $('<li class="duration">'+aC.niceDuration(v.duration)+'</li><li class="track-title">'+(i+1)+'. '+v.track+'</li><li class="artist">'+v.artist+'</li>');
 				list.push($("<li/>").attr('class','music-paused item playlist').setData(v).html(html).append(itemlist.append(item))[0]);
 			} else {
 				var name = v.split(" - ");
 				var html = $("<ul/>").attr('class','ppbtn'),
 					itemlist = $("<ul/>").attr('class','track-info'),
-					item = $('<li class="duration"></li><li class="track-title">'+name[0]+'</li><li class="artist">'+name[1]+'</li>');
+					item = $('<li class="duration"></li><li class="track-title">'+(i+1)+'. '+name[0]+'</li><li class="artist">'+name[1]+'</li>');
 				list.push($("<li/>").attr('class','music-paused item playlist').html(html).append(itemlist.append(item))[0]);
 			}
 		});
@@ -47,25 +42,13 @@ loadPlaylist: function(){
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
 	} else console.log('Playlist is empty');
-	/*
-<li class="track-1tJkic0TURTCXw3rBhYgWu music-paused item playlist" data-id="0" data-duration="175">
-	<div class="ppbtn"></div>
-	<ul class="track-info">
-		<li class="duration">2:56</li>
-		<li class="track-title">1. What Would You Do?</li>
-		<li class="artist">City High</li>
-	</ul>
-</li>
-	*/
 },
-niceDuration: function(b){
-	var g = b / 60,
-		b = Math.floor(g),
-		g = Math.round(60 * (g - b));
-	60 == g && (b++, g = 0);
-	return 10 > g ? b + ":0" + g : b + ":" + g;
+niceDuration: function(a){
+	var b = a / 60, a = Math.floor(b), b = Math.round(60 * (b - a));
+	60 == b && (a++, b = 0);
+	return 10 > b ? a + ":0" + b : a + ":" + b;
 },
-getDimensions: function(){
+setDimensions: function(){
 	/* How to calculate left position of #widgetContainer based on screen size? */
 	/* How to calculate height of #mainContainer based on screen size? Width of .player, #mainContainer, and .jspContainer is based off of this height */
 	/* When we set the width and height of mainContainer also set the width of .jspPane height is 11px less than #mainContainer */
@@ -78,7 +61,7 @@ getDimensions: function(){
 	
 },
 showNotificationBar: function(a){
-	$("#notifBar #message")[0].innerHTML = a;
+	$("#notifBar #message")[0].html(a);
 	$("#notifBar").animate({top: 0}, "fast");
 },
 hideNotificationBar: function(){
@@ -87,7 +70,7 @@ hideNotificationBar: function(){
 };
 
 $(document).ready(function(){
-	aC.getDimensions();
+	aC.setDimensions();
 	$.getJSON("playlist.json", function(a){
 		if ($.isArray(a.data)) {
 			aC.playlist = a.data;
