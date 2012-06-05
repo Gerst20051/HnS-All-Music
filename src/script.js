@@ -37,16 +37,8 @@ loadPlaylist: function(playlist){
 			}
 		});
 		$("#content").html(list);
-		$("#mainContainer").jScrollPane({showArrows:true});
+		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
-		/*
-		$(".aup").live('click',function(){
-			$('.jspScrollable').data('jsp').scrollByY(-1000);
-		});
-		$(".jspArrowDown").live('click',function(){
-			$('.jspScrollable').data('jsp').scrollByY(1000);
-		});
-		*/
 	} else console.log('Playlist is empty');
 },
 checkPlaylist: function(){
@@ -136,12 +128,6 @@ $(document).ready(function(){
 	$("#content").on('click','.i',function(a){
 		console.log('data',$(this).data());
 		aC.triggerPlayPause($(this), a);
-	});
-	
-	$("#mainContainer").hover(function(e){
-		var x = e.pageX - this.offsetLeft;
-		var y = e.pageY - this.offsetTop;
-		console.log(x +', '+ y);
 	});
 });
 
