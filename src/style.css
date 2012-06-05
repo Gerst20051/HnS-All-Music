@@ -534,10 +534,10 @@ background-image:url(i/icon.png);
 background-repeat:no-repeat;
 width:27px;
 height:28px;
-position:relative;
+position:absolute;
 float:right;
-right:0;
-top:50px;
+right:1px;
+top:51px;
 }
 
 #mainContainer {
@@ -665,6 +665,16 @@ overflow:hidden;
 -o-text-overflow:ellipsis;
 text-overflow:ellipsis;
 white-space:nowrap;
+}
+
+#vD {
+visibility:hidden;
+}
+
+#vD .hidden {
+height:0;
+overflow:hidden;
+width:0;
 }
 
 #engageView {

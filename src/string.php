@@ -44,7 +44,8 @@ if (is_writable($f)) {
 	echo "Success, wrote data to file ($f)";
 	fclose($handle);
 } else echo "The file $f is not writable";
-}
+$echo = "var APP = ".$data.";";
+} else $echo = "var APP = ".file_get_contents("playlist.json").";";
 ?>
 
 <!DOCTYPE html>
@@ -54,17 +55,17 @@ if (is_writable($f)) {
 var sc="script",ce="createElement",sa="setAttribute",d=document,tn="getElementsByTagName",ua=window.navigator.userAgent,agent=false;if(ua.indexOf("Firefox")!==-1||ua.indexOf("Opera")!==-1)agent=true;
 for(var i=0,l=s.length;i<l;++i){if(agent){var t=d[ce](sc);t[sa]("src",s[i]);d[tn]("head")[0].appendChild(t);}else{d.write("<"+sc+" src=\""+s[i]+"\"></"+sc+">");}}
 })();
-<?php echo "var JSON = ".$data.";"; ?>
+<?php echo $echo; ?>
 </script>
 </head>
 <body>
 <script>
-var run = -1, steps = 100, dlen = APP.data.length-1, reps = 1;
-run = (100 * reps) - 1;
+var run = -1, steps = 1000, dlen = APP.data.length-1, reps = 6;
+run = (100 * reps) - 1; var run2 = run;
 
 function init(){
 	setTimeout(function(){
-		if (run < run+steps+1) {
+		if (run < run2+steps+1) {
 			v = APP.data[++run];
 			if ($.trim(v.artist + " " + v.track) == '') {
 				console.log('Error! Bad Artist or Track Name');
@@ -73,9 +74,9 @@ function init(){
 			}
 			doInstantSearch($.trim(v.artist+ " " + v.track));
 		} else {
-			$("body").css({'margin':0,'overflow':'hidden'}).append('<textarea id="output"></textarea>').find("#output").height($(window).height()).width($(window).width()).val(JSON.stringify(APP.data)).focus().select();
+			$("body").css({'margin':0,'overflow':'hidden'}).append('<textarea id="output"></textarea>').find("#output").height($(window).height()).width($(window).width()).val('{"data":'+JSON.stringify(APP.data)+'}').focus().select();
 		}
-	}, 5000);
+	}, 3500);
 }
 
 function doInstantSearch(search){
@@ -83,7 +84,7 @@ function doInstantSearch(search){
 		type: "GET",
 		url: 'http://suggestqueries.google.com/complete/search?hl=en&ds=yt&client=youtube&hjson=t&jsonp=window.yt&q='+encodeURIComponent(search)+'&cp=1',
 		dataType: "script",
-		timeout: 2000,
+		timeout: 3500,
 		error: function(a,b){
 			console.log('Error! dIS Type: '+b);
 			APP.data[run].id = 0;
@@ -98,7 +99,7 @@ function yt(a){
 		type: "GET",
 		url: 'http://gdata.youtube.com/feeds/api/videos?q='+encodeURIComponent(suggest)+'&format=5&max-results=1&v=2&alt=jsonc',
 		dataType: "jsonp",
-		timeout: 2000,
+		timeout: 3500,
 		success: function(b,c,d){
 			if (b.data.items){
 				var e = b.data.items[0];

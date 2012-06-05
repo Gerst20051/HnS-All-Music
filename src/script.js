@@ -16,6 +16,15 @@ $.fn.setData = function(obj){
 	});
 };
 
+$.fn.center = function(){
+	var w = $(window);
+	return this.each(function(){
+		$(this).css("position","absolute");
+		$(this).css("top",((w.height() - $(this).outerHeight()) / 2) + w.scrollTop() + "px");
+		$(this).css("left",((w.width() - $(this).outerWidth()) / 2) + w.scrollLeft() + "px");
+	});
+};
+
 function sls(){
 	return ('localStorage' in window) && window['localStorage'] !== null;
 }
@@ -29,7 +38,11 @@ Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)];
 
 (function(){
 aC = {
+devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
+playerWidth: 720,
+playerHeight: 405,
 playlist: [],
+index: -1,
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
 		$(".player .album-art .art").attr('src',playlist[0].img).setData({index:0});
@@ -100,7 +113,11 @@ changePlayModeForTrack: function(b){
 	durationTimer && (clearInterval(durationTimer), durationTimer = null);
 	$(".music-playing").removeClass("music-playing").addClass("music-paused");
 	g = $(".track-" + trackId);
-	if (0 < g.length && (q && ($(".player").removeClass("music-paused").addClass("music-playing"), updateStatusBar(g)), $(".active").removeClass("active"), g.attr("class", q ? "track-" + trackId + " music-playing active item " + contextType : "track-" + trackId + " music-paused active item " + contextType), g.each(function(b, g){
+	if (0 < g.length && (q && ($(".player").removeClass("music-paused").addClass("music-playing"),
+	updateStatusBar(g)),
+	$(".active").removeClass("active"),
+	g.attr("class", q ? "track-" + trackId + " music-playing active item " + contextType : "track-" + trackId + " music-paused active item " + contextType),
+	g.each(function(b, g){
 		$(g)
 	}), q)) {
 		$("#engageView").removeClass("music-paused").addClass("music-playing");
@@ -120,12 +137,38 @@ changePlayModeForTrack: function(b){
 		}, 1E3)
 	}
 },
+changeTrack: function(a){
+	seekerInterval && (clearInterval(seekerInterval), seekerInterval = null);
+	durationTimer && (clearInterval(durationTimer), durationTimer = null);
+	$(".on").removeClass("on").addClass("off");
+	$(".player").removeClass("off").addClass("on");
+		$("#engageView").removeClass("off").addClass("on");
+		var s = $(".player .meta .progress-bar-container .buffer").width(),
+			q = Number(aC.playlist[a].duration),
+			g = Math.floor(q / s);
+		$(".on .seeker").width(Math.floor(s / q * 1E3 * b.playing_position));
+		seekerInterval = setInterval(function(){
+			var b = $(".on .seeker").width();
+			b < s && $(".on .seeker").width(b+1);
+		}, g);
+		var p = 1E3 * b.playing_position;
+		$(".player .meta .progress-bar-container .time-spent")[0].html(readableTime(p));
+		durationTimer = setInterval(function(){
+			p = p + 1E3;
+			$(".player .meta .progress-bar-container .time-spent")[0].html(readableTime(p));
+		}, 1E3);
+},
 triggerPlayPause: function(a){ /* Pass Index */
-	$(".player .meta .controls .time-spent").text("0:00");
-	aC.hideNotificationBar();
-	$(".player .meta .progress-bar-container .controls .buffer").width($(this).width() - 16);
-	if (a > 1) $(".player .meta .progress-bar-container .controls .buffer").css('margin-left',1);
-	console.log(a);
+	if (a == aC.index) { /* pause */
+		
+	} else { /* play this song */
+		$(".player .meta .controls .time-spent").text("0:00");
+		aC.hideNotificationBar();
+		$(".player .meta .progress-bar-container .controls .buffer").width($(this).width() - 16);
+		if (a > 1) $(".player .meta .progress-bar-container .controls .buffer").css('margin-left',1);
+		console.log(a);
+			
+	}
 	/*
 	var clickedTrack = a;
 	setTimeout(function(){
@@ -146,6 +189,7 @@ triggerPlayPause: function(a){ /* Pass Index */
 $(document).ready(function(){
 	aC.setDimensions();
 	aC.checkPlaylist();
+	loadPlayer();
 	$("#notifBar .notifCloseButton").live('click',function(){
 		hideNotificationBar();
 	});
@@ -165,6 +209,50 @@ $(document).ready(function(){
 		aC.triggerPlayPause($(this).data('index'));
 	});
 });
+
+function loadPlayer(){
+	var a = {allowScriptAccess: "always"};
+	var b = {id: "ytplayer"};
+	swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
+}
+
+function onYouTubePlayerReady(a){
+	ytplayer = document.getElementById("ytplayer");
+	ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
+	ytplayer.addEventListener("onError", "onPlayerError");
+	$("#vD").center().addClass('hidden');
+}
+
+function onPlayerStateChange(a){
+	if (a == 0) goNextVideo();
+}
+
+function onPlayerError(a){
+	goNextVideo();
+	console.log('Error! oPE Type: '+a);
+}
+
+
+function goNextVideo(){
+
+}
+
+function loadAndPlayVideo(a){
+	if (ytplayer){
+		ytplayer.loadVideoById(a[0]);
+		currentVideoId = a[0];
+	}
+}
+
+function loadVideo(a){if (ytplayer){ytplayer.cueVideoById(a);currentVideoId=a}}
+function playVideo(){if (ytplayer) ytplayer.playVideo()}
+function pauseVideo(){if (ytplayer) ytplayer.pauseVideo()}
+function stopVideo(){if (ytplayer) ytplayer.stopVideo()}
+function setVolume(v){if (ytplayer) ytplayer.setVolume(v)}
+function getDuration(){if (ytplayer) return ytplayer.getDuration()}
+function getCurrentTime(){if (ytplayer) return ytplayer.getCurrentTime()}
+function setSize(w,h){if (ytplayer) return ytplayer.setSize(w,h)}
+function seekTo(s){if (ytplayer) return ytplayer.seekTo(s,false)}
 
 tfObjSort={
 	init:function(){
