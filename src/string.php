@@ -1,8 +1,8 @@
 <?php
 $f = file("playlist.txt"); $l = (count($f) - 1); $textarea = false; $capitalize = false; $writetofile = false; $clean = true;
 if ($textarea) {
-echo '<script type="text/javascript">function selectAll(){document.dform.demo.focus();document.dform.demo.select()}</script>';
-echo '<body onload="selectAll();"><form name="dform"><textarea name="demo" style="height:98%;width:100%">';
+echo '<script type="text/javascript">function selectAll(){document.dform.output.focus();document.dform.output.select()}</script>';
+echo '<body onload="selectAll();"><form name="dform"><textarea name="output" style="height:98%;width:100%">';
 }
 
 function clean($s){
@@ -59,130 +59,69 @@ for(var i=0,l=s.length;i<l;++i){if(agent){var t=d[ce](sc);t[sa]("src",s[i]);d[tn
 </head>
 <body>
 <script>
-function doInstantSearch(){
-	if (xhrWorking){
-		pendingSearch = true;
-		return;
-	}
-	var c = $("input[type='text']#sB");
-	if ($.trim(c.val()) == currentSearch) return;
-	currentSearch = $.trim(c.val());
-	if (currentSearch == ''){
-		cleanInterface();
-		return;
-	}
-	c.attr('class', 'sL');
-	var d = 'http://suggestqueries.google.com/complete/search?hl=en&ds=yt&client=youtube&hjson=t&jsonp=window.yt.www.suggest.handleResponse&q=' + encodeURIComponent(currentSearch) + '&cp=1';
-	xhrWorking = true;
+var run = -1, steps = 100, dlen = APP.data.length-1, reps = 1;
+run = (100 * reps) - 1;
+
+function init(){
+	setTimeout(function(){
+		if (run < run+steps+1) {
+			v = APP.data[++run];
+			if ($.trim(v.artist + " " + v.track) == '') {
+				console.log('Error! Bad Artist or Track Name');
+				APP.data[run].id = 0;
+				return init();
+			}
+			doInstantSearch($.trim(v.artist+ " " + v.track));
+		} else {
+			$("body").css({'margin':0,'overflow':'hidden'}).append('<textarea id="output"></textarea>').find("#output").height($(window).height()).width($(window).width()).val(JSON.stringify(APP.data)).focus().select();
+		}
+	}, 5000);
+}
+
+function doInstantSearch(search){
 	$.ajax({
 		type: "GET",
-		url: d,
+		url: 'http://suggestqueries.google.com/complete/search?hl=en&ds=yt&client=youtube&hjson=t&jsonp=window.yt&q='+encodeURIComponent(search)+'&cp=1',
 		dataType: "script",
 		timeout: 2000,
-		error: function(a, b){
-			addAlert('<b class="error">Error!</b> dIS Type: ' + b, 5000, 2000);
-			doneWorking();
+		error: function(a,b){
+			console.log('Error! dIS Type: '+b);
+			APP.data[run].id = 0;
+			return init();
 		}
 	});
 }
 
-yt = {}, yt.www = {}, yt.www.suggest = {};
-yt.www.suggest.handleResponse = function(a){
-	if (!dC.exactSearch){
-		if (a[1][0]) var suggest = a[1][0][0];
-		else var suggest = null;
-		var l = 1;
-	} else var suggest = null, l = 0;
-	instantHash(currentSearch);
-	if (dC.exactSearch || !suggest){
-		suggest = currentSearch;
-		updateSuggestedKeyword(suggest + ' (Exact search)');
-	} else updateSuggestedKeyword(suggest);
-	var c = ['<ul id="suggest">'], cs = currentSearch.toLowerCase().replace(/[^a-z0-9]/g, " ");
-	var d = cs.indexOf("  ");
-	while (d != -1){
-		cs = cs.replace("  ", " ");
-		d = cs.indexOf("  ");
-	}
-	for (var i = l; i < a[1].length; i++){
-		if (a[1][i][0] != cs){
-			c.push("<li content=\"" + a[1][i][0] + "\">" + a[1][i][0].replace(cs, "<b>" + cs + "</b>") + "</li>");
-		}
-	}
-	c.push('</ul>');
-	$("div#sug").html(c.join(''));
-	if (!dC.exactSearch){
-		if (suggest == currentSuggestion){
-			doneWorking();
-			return;
-		} else currentSuggestion = suggest;
-	}
-	getTopSearchResult(suggest);
-};
-
-function getTopSearchResult(e){
-	var f = 'http://gdata.youtube.com/feeds/api/videos?q=' + encodeURIComponent(e) + '&format=5&max-results=' + dC.vThumbs + '&v=2&alt=jsonc';
+function yt(a){
+	if (a[1][0]) var suggest = a[1][0][0]; else var suggest = a[0];
 	$.ajax({
 		type: "GET",
-		url: f,
+		url: 'http://gdata.youtube.com/feeds/api/videos?q='+encodeURIComponent(suggest)+'&format=5&max-results=1&v=2&alt=jsonc',
 		dataType: "jsonp",
 		timeout: 2000,
-		success: function(a, b, c){
-			if (a.data.items){
-				var d = a.data.items;
-				playlistArr = [];
-				playlistArr.push(d);
-				updateVideoDisplay(d);
-				pendingDoneWorking = true;
+		success: function(b,c,d){
+			if (b.data.items){
+				var e = b.data.items[0];
+				var thisrun = APP.data[run];
+				thisrun.id = e.id;
+				thisrun.img = e.thumbnail.sqDefault;
+				thisrun.duration = e.duration;
+				APP.data[run] = thisrun;
 			} else {
-				updateSuggestedKeyword('No results for "' + e + '"');
-				doneWorking();
+				console.log('No results for '+suggest);
+				APP.data[run].id = 0;
 			}
+			return init();
 		},
-		error: function(a, b){
-			addAlert('<b class="error">Error!</b> gTSR Type: ' + b, 5000, 2000);
-			doneWorking();
+		error: function(b,c){
+			console.log('Error! gTSR Type: '+c);
+			APP.data[run].id = 0;
+			return init();
 		}
 	});
-}
+};
 
-function updateVideoDisplay(b){
-	var c = (b.length >= dC.vThumbs) ? dC.vThumbs : b.length;
-	var d = $("<div />").attr('id', 'pl');
-	for (var i = 0; i < c; i++){
-		var e = b[i].id, vTitle = b[i].title;
-		var f = $("<div />").attr('class', 'vW').attr('id', e);
-		var a = $("<div />");
-		var g = $("<div />").attr('class', 'overlay');
-		var h = $("<img />").attr('class', 'thumb').attr('src', b[i].thumbnail.sqDefault);
-		var j = $("<div />").attr('class', 'title').html(vTitle);
-		var k = $("<div />").attr('class', 'play-symbol');
-		var l = $("<img />").attr('src', 'i/overlay-play.png').attr('title', b[i].description);
-		var m = $("<div />").attr('class', 'thumb-info');
-		var n = new Date(b[i].uploaded);
-		var o = new Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat");
-		var p = new Array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-		var q = o[n.getDay()] + ", " + p[n.getMonth()] + " " + n.getDate() + ", " + n.getFullYear();
-		var r = $("<time />").attr('class', 'date').html(q);
-		var s = $("<p />").attr('class', 'time').html(gettime(b[i].duration));
-		var t = $("<img />").attr('class', 'addvideo').attr('src', 'i/add.png').attr('title', 'Add To Queue').attr('content', vTitle);
-		var u = $("<img />").attr('class', 'viewvideo').attr('src', 'i/view.png').attr('title', 'Load Related Videos').attr('content', vTitle);
-		var y = $("<span />").attr('class', 'vT');
-		var z = $("<span />").attr('class', 'viewCount').html(b[i].viewCount).digits();
-		if (dC.thumbHeight != 99){
-			f.height(dC.thumbHeight);
-			g.height(dC.thumbHeight);
-			h.height(dC.thumbHeight);
-			j.height(dC.thumbHeight - 5);
-		}
-		d.append(f.html(a.append(m.append(r).append(s)).append(g).append(h).append(j)).append(k.html(l)).append(y.append(z).append(t).append(u)));
-	}
-	$("div#pW").find("div#pl").remove().end().append(d);
-	currentPlaylistPos = -1;
-	doneWorking();
-}
-
-$(document).ready(doInstantSearch);
+$(document).ready(init);
 </script>
 </body>
 </html>

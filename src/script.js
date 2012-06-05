@@ -16,6 +16,10 @@ $.fn.setData = function(obj){
 	});
 };
 
+function sls(){
+	return ('localStorage' in window) && window['localStorage'] !== null;
+}
+
 (function(){
 aC = {
 playlist: [],
@@ -27,8 +31,8 @@ loadPlaylist: function(playlist){
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
 				var html = $("<div/>").attr('class','ppbtn'),
-					itemlist = $("<ul/>").attr('class','track-info'),
-					item = $('<li class="duration">'+aC.niceDuration(v.duration)+'</li><li class="track-title">'+(i+1)+'. '+v.track+'</li><li class="artist">'+v.artist+'</li>');
+					itemlist = $("<ul/>").attr('class','ti'),
+					item = $('<li class="d">'+aC.niceDuration(v.duration)+'</li><li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>');
 				list.push($("<li/>").attr('class','off i p').setData(v).html(html).append(itemlist.append(item))[0]);
 			}
 		});
@@ -36,6 +40,20 @@ loadPlaylist: function(playlist){
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
 	} else console.log('Playlist is empty');
+},
+checkPlaylist: function(){
+	if (sls()) {
+		if (localStorage.getItem('playlist')){
+			aC.playlist = $.parseJSON(localStorage.getItem('playlist'));
+		}
+	}
+	$.getJSON("playlist.json", function(a){
+		localStorage['playlist'] = JSON.stringify(a);
+		if ($.isArray(a.data)) {
+			aC.playlist = a.data;
+			aC.loadPlaylist(aC.playlist);
+		} else console.log("Error loading playlist");
+	});
 },
 niceDuration: function(a){
 	var b = a / 60, a = Math.floor(b), b = Math.round(60 * (b - a));
@@ -66,12 +84,7 @@ hideNotificationBar: function(){
 
 $(document).ready(function(){
 	aC.setDimensions();
-	$.getJSON("playlist.json", function(a){
-		if ($.isArray(a.data)) {
-			aC.playlist = a.data;
-			aC.loadPlaylist(aC.playlist);
-		} else console.log("Error loading playlist");
-	});
+	aC.checkPlaylist();
 	$("#notifBar .notifCloseButton").live('click',function(){
 		hideNotificationBar();
 	});

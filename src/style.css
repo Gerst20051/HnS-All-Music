@@ -621,7 +621,7 @@ background-position:-50px -0px;
 background-position:-75px -0px;
 }
 
-.track-info {
+.ti {
 float:right;
 position:relative;
 font-family:"lucida grande",tahoma,Verdana,Arial;
@@ -634,7 +634,7 @@ letter-spacing:.019em;
 width:587px;
 }
 
-.duration {
+.d {
 color:#8c8c8c;
 float:right;
 padding-right:14px;
@@ -642,7 +642,7 @@ padding-top:7px;
 font-weight:bold;
 }
 
-.track-title {
+.tt {
 padding-left:7px;
 padding-right:15px;
 font-weight:bold;
@@ -650,7 +650,7 @@ padding-top:0;
 letter-spacing:.019em;
 }
 
-.artist {
+.a {
 padding-left:7px;
 padding-right:15px;
 font-size:11px;
@@ -659,8 +659,8 @@ letter-spacing:0;
 color:#838383;
 }
 
-.track-title,
-.artist {
+.tt,
+.a {
 overflow:hidden;
 -o-text-overflow:ellipsis;
 text-overflow:ellipsis;
