@@ -20,13 +20,21 @@ function sls(){
 	return ('localStorage' in window) && window['localStorage'] !== null;
 }
 
+function getRandomInt(min,max){
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
+Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
+
 (function(){
 aC = {
 playlist: [],
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
 		$(".player .album-art .art").attr('src',playlist[0].img).setData({index:0});
-		$(".player .meta .titles").find(".track-name").text(playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
+		$(".player .meta .titles").find(".track-name").text('1. '+playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
+		alert($(".track-name").data('index'));
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
@@ -45,14 +53,17 @@ checkPlaylist: function(){
 	if (sls()) {
 		if (localStorage.getItem('playlist')){
 			aC.playlist = $.parseJSON(localStorage.getItem('playlist'));
-			aC.loadPlaylist(aC.playlist);
+			if ($.isArray(aC.playlist)) aC.loadPlaylist(aC.playlist);
+			else console.log("Error loading local playlist");
 		}
 	}
 	$.getJSON("playlist.json", function(a){
-		localStorage['playlist'] = JSON.stringify(a);
 		if ($.isArray(a.data)) {
-			aC.playlist = a.data;
-			aC.loadPlaylist(aC.playlist);
+			localStorage['playlist'] = JSON.stringify(a.data);
+			if (!$.isArray(aC.playlist)) {
+				aC.playlist = a.data;
+				aC.loadPlaylist(aC.playlist);
+			}
 		} else console.log("Error loading playlist");
 	});
 },
@@ -62,14 +73,16 @@ niceDuration: function(a){
 	return 10 > b ? a + ":0" + b : a + ":" + b;
 },
 setDimensions: function(){
-	var w = $(window), height = w.height()/* 699 */, width = w.width()/* 1280 */;
-	var dimension = height - $(".player").outerHeight();
+	var w = $(window), height = w.height(), width = w.width();
+	var dimension = height - $(".player").outerHeight() - 1;
 	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(dimension).add(".player").width(dimension);
 	if (dimension < width) {
 		$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
-		
-	} else {
-		$("").width(width);
+		$(".player .meta .progress-bar-container").width(dimension - 123);
+		$(".player .meta .progress-bar-container .controls .buffer").width(dimension - 171);
+		$(".ti").width(dimension - 31); /* not updating */
+	} else { // bigger
+		//$("").width(width);
 	}
 },
 showNotificationBar: function(a){
@@ -79,12 +92,40 @@ showNotificationBar: function(a){
 hideNotificationBar: function(){
 	$("#notifBar").animate({top: -80}, "fast");
 },
+changePlayModeForTrack: function(b){
+	var g = b.track, q = b.status;
+	clickedTrack = null;
+	trackId = getTrackId(g);
+	seekerInterval && (clearInterval(seekerInterval), seekerInterval = null);
+	durationTimer && (clearInterval(durationTimer), durationTimer = null);
+	$(".music-playing").removeClass("music-playing").addClass("music-paused");
+	g = $(".track-" + trackId);
+	if (0 < g.length && (q && ($(".player").removeClass("music-paused").addClass("music-playing"), updateStatusBar(g)), $(".active").removeClass("active"), g.attr("class", q ? "track-" + trackId + " music-playing active item " + contextType : "track-" + trackId + " music-paused active item " + contextType), g.each(function(b, g){
+		$(g)
+	}), q)) {
+		$("#engageView").removeClass("music-paused").addClass("music-playing");
+		var s = $(".player .meta .progress-bar-container .buffer").width(),
+			q = Number(g.attr("data-duration-ms")),
+			g = Math.floor(q / s);
+		$(".music-playing .seeker").width(Math.floor(s / q * 1E3 * b.playing_position));
+		seekerInterval = setInterval(function(){
+			var b = $(".music-playing .seeker").width();
+			b < s && $(".music-playing .seeker").width(b + 1)
+		}, g);
+		var p = 1E3 * b.playing_position;
+		$(".player .meta .progress-bar-container .time-spent")[0].innerHTML = readableTime(p);
+		durationTimer = setInterval(function(){
+			p = p + 1E3;
+			$(".player .meta .progress-bar-container .time-spent")[0].innerHTML = readableTime(p)
+		}, 1E3)
+	}
+},
 triggerPlayPause: function(a){ /* Pass Index */
 	$(".player .meta .controls .time-spent").text("0:00");
 	aC.hideNotificationBar();
-	
-	
-	
+	$(".player .meta .progress-bar-container .controls .buffer").width($(this).width() - 16);
+	if (a > 1) $(".player .meta .progress-bar-container .controls .buffer").css('margin-left',1);
+	console.log(a);
 	/*
 	var clickedTrack = a;
 	setTimeout(function(){
@@ -117,17 +158,11 @@ $(document).ready(function(){
 			width: $(".player").width() - $('.player').outerHeight() - 8 - 8 - 19
 		}, 100)
 	});
-	$(".player .meta .titles .track-name").live('click',function(){
-		console.log($(this).data('index')+1);
-		
-	});
 	$(".player .album-art-container").live('click',function(a){
-		console.log('data',$(this).data());
-		aC.triggerPlayPause($("#content .l").eq($(this).parent().attr("rel")), a);
+		aC.triggerPlayPause($(this).data('index'));
 	});
 	$("#content").on('click','.i',function(a){
-		console.log('data',$(this).data());
-		aC.triggerPlayPause($(this), a);
+		aC.triggerPlayPause($(this).data('index'));
 	});
 });
 

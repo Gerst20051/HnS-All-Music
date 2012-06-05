@@ -460,7 +460,7 @@ width:431px; /* when skip-back is visible -16px */
 
 .player .meta .progress-bar-container .controls .buffer .seeker {
 width:0;
-width:332px;
+width:100px;
 height:5px;
 background-image:url(i/seeker.png);
 border-top-left-radius:1px;
