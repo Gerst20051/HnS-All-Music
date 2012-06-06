@@ -60,12 +60,13 @@ for(var i=0,l=s.length;i<l;++i){if(agent){var t=d[ce](sc);t[sa]("src",s[i]);d[tn
 </head>
 <body>
 <script>
-var run = -1, steps = 1000, dlen = APP.data.length-1, reps = 6;
-run = (100 * reps) - 1; var run2 = run;
+var all = true, run = -1, steps = 200, dlen = APP.data.length-1, reps = 18;
+run = (100 * reps) - 1; var run2 = run+steps+1;
+if (all === true) var end = dlen; else end = run2;
 
 function init(){
 	setTimeout(function(){
-		if (run < run2+steps+1) {
+		if (run < end) {
 			v = APP.data[++run];
 			if ($.trim(v.artist + " " + v.track) == '') {
 				console.log('Error! Bad Artist or Track Name');
