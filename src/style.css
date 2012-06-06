@@ -108,7 +108,6 @@ width:15px;
 z-index:1;
 }
 
-
 .closeButton:hover,
 .notifCloseButton:hover {
 background-position:-16px 0;
@@ -117,7 +116,6 @@ background-position:-16px 0;
 .closeButton:active,
 .notifCloseButton:active {
 background-position:-32px 0;
-}
 }
 
 .player {
