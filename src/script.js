@@ -64,8 +64,10 @@ UP_ARROW_OLD: 63232
 aC = {
 devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
 playbackQuality: "small",
-playerWidth: 900,
 playerHeight: 506,
+newPlayerHeight: 0,
+playerWidth: 900,
+newPlayerWidth: 0,
 dimension: 0,
 history: [],
 historyPos: -1,
@@ -73,14 +75,14 @@ playlist: [],
 playlistLength: 0,
 index: -1,
 mode: "order",
-autostart: false,
+autostart: true,
+resizeTO: false,
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
 		var index = (aC.mode == "order") ? 0 : getRandomInt(0,aC.playlistLength);
 		while (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
 		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',playlist[index].img);
 		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+playlist[index].track).setData({index:index}).end().find(".artist-name").text(playlist[index].artist);
-		if (aC.autostart === true && !checkHash()) aC.triggerPlayPause(index);
 		aC.index = index;
 		var list = [];
 		$.each(playlist, function(i,v){
@@ -95,6 +97,7 @@ loadPlaylist: function(playlist){
 			}
 		});
 		$("#content").html(list);
+		$(".ti").width(aC.dimension - 74);
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
 	} else console.log('Playlist is empty');
@@ -121,20 +124,22 @@ checkPlaylist: function(){
 },
 checkHash: function(){
 	var hash = getHash(), found = false;
-	if (hash == "0") return;
-	for (var index in aC.playlist) {
-		if (aC.playlist[index].id == hash) {
-			aC.triggerPlayPause(parseInt(index));
-			$('.player .meta .track-name').click();
-			setTimeout("$('.player .list').click()",1000);
-			setTimeout("$('#widgetContainer').animate({opacity:1})",1500);
-			found = true;
-			break;
+	if (hash.length > 1) {
+		for (var index in aC.playlist) {
+			if (aC.playlist[index].id == hash) {
+				aC.triggerPlayPause(parseInt(index));
+				$('.player .meta .track-name').click();
+				setTimeout("$('.player .list').click()",1000);
+				setTimeout("$('#widgetContainer').animate({opacity:1})",1500);
+				found = true;
+				break;
+			}
 		}
 	}
 	if (found === false) {
 		clearHash();
 		$('#widgetContainer').animate({opacity:1});
+		if (aC.autostart === true) aC.triggerPlayPause(aC.index);
 		return false;
 	} else return true;
 },
@@ -146,16 +151,31 @@ niceDuration: function(a){
 setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
 	aC.dimension = height - $(".player").outerHeight() - 1;
-	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(aC.dimension).add(".player").width(aC.dimension);
-	if (aC.dimension < width) {
-		$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
-		$(".player .meta .progress-bar-container").width(aC.dimension - 123);
-		$(".player .meta .progress-bar-container .controls .buffer").width(aC.dimension - 171);
-		$(".ti").width(aC.dimension - 31); /* not updating */
-	} else { // bigger
-		//$("").width(width);
+	$("#mainContainer").height(aC.dimension).add(".player").width(aC.dimension);
+	$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
+	$(".player .meta .progress-bar-container").width(aC.dimension - 123);
+	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(aC.dimension - 187);
+	else $(".player .meta .controls .buffer").width(aC.dimension - 171);
+	$(".overlay").width(aC.dimension);
+	$(".ti").width(aC.dimension - 74);
+	if (arguments.length == 1) {
+		setTimeout(function(){
+			aC.setPlayerDimensions();
+			$(".jspScrollable").data('jsp').reinitialise();
+			$(".jspPane").width($(".jspContainer").width());
+		},1000);
 	}
 	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) aC.showNotification("This website works best while using Google Chrome. Wise up!");
+},
+setPlayerDimensions: function(){
+	var w = $(window), height = w.height(), width = w.width();
+	if (width < aC.playerWidth+100 || height < aC.playerHeight+100) {
+		aC.newPlayerWidth = width - 100;
+		aC.newPlayerHeight = aC.newPlayerWidth * .5625;
+		$(ytplayer).height(aC.newPlayerHeight).width(aC.newPlayerWidth);
+		alert("hey");
+		$("#vD").center();
+	}
 },
 showNotification: function(a){
 	$("#notifBar #message").html(a);
@@ -187,7 +207,7 @@ handleTrack: function(){
 	*/
 },
 triggerPlayPause: function(a){
-	var player = $(".player"), pid = aC.playlist[a].id;
+	var player = $(".player");
 	while (aC.playlist[a].id == 0) a = (aC.mode == "order") ? (index+1) : getRandomInt(0,aC.playlistLength);
 	if (a == aC.index) {
 		if (player.hasClass("on")) {
@@ -267,7 +287,10 @@ onKeyDown: function(e){
 }
 };
 })();
-
+$(window).resize(function(){
+	if (aC.resizeTO !== false) clearTimeout(aC.resizeTO);
+	aC.resizeTO = setTimeout(aC.setDimensions(true), 200);
+});
 $(document).ready(function(){
 	aC.setDimensions();
 	aC.checkPlaylist();
@@ -311,6 +334,12 @@ $(document).ready(function(){
 	$("#content").on('click','.i',function(){
 		aC.triggerPlayPause($(this).index());
 	});
+	$(".player .skip-back").live('click',function(){
+		alert('back');
+	});
+	$(".player .skip-fwd").live('click',function(){
+		alert('forward');
+	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
 		swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
@@ -321,6 +350,7 @@ function onYouTubePlayerReady(a){
 	ytplayer = document.getElementById("ytplayer");
 	ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
 	ytplayer.addEventListener("onError", "onPlayerError");
+	aC.setPlayerDimensions();
 	$("#vD").center().addClass('hidden').css('visibility','visible');
 	aC.checkHash();
 }
