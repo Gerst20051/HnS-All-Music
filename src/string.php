@@ -47,16 +47,11 @@ if (is_writable($f)) {
 $echo = "var APP = ".$data.";";
 } else $echo = "var APP = ".file_get_contents("playlist.json").";";
 ?>
-
 <!DOCTYPE html>
 <html lang="en" dir="ltr"><head><meta charset="utf-8">
 <title>Create Playlist JSON</title>
-<script>(function(){var s=["https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js","https://raw.github.com/kvz/phpjs/master/functions/json/json_encode.js"];
-var sc="script",ce="createElement",sa="setAttribute",d=document,tn="getElementsByTagName",ua=window.navigator.userAgent,agent=false;if(ua.indexOf("Firefox")!==-1||ua.indexOf("Opera")!==-1)agent=true;
-for(var i=0,l=s.length;i<l;++i){if(agent){var t=d[ce](sc);t[sa]("src",s[i]);d[tn]("head")[0].appendChild(t);}else{d.write("<"+sc+" src=\""+s[i]+"\"></"+sc+">");}}
-})();
-<?php echo $echo; ?>
-</script>
+<script src="http://code.jquery.com/jquery.min.js"></script>
+<script><?php echo $echo; ?></script>
 </head>
 <body>
 <script>
