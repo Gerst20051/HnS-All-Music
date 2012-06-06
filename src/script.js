@@ -130,7 +130,7 @@ setDimensions: function(){
 	} else { // bigger
 		//$("").width(width);
 	}
-	if ((rchrome.test(navigator.userAgent.toLowerCase()))) aC.showNotification("This website works best while using Google Chrome. Wise up!");
+	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) aC.showNotification("This website works best while using Google Chrome. Wise up!");
 },
 showNotification: function(a){
 	$("#notifBar #message").html(a);
