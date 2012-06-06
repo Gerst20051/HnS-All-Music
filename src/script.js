@@ -64,14 +64,18 @@ playerWidth: 900,
 playerHeight: 506,
 dimension: 0,
 history: [],
+historyPos: -1,
 playlist: [],
 playlistLength: 0,
 index: -1,
 mode: "order",
+autostart: false,
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
-		$(".player .album-art-container").setData({index:0}).find(".art").attr('src',playlist[0].img);
-		$(".player .meta .titles").find(".track-name").text('1. '+playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
+		var index = (aC.mode == "order") ? 0 : getRandomInt(0,aC.playlistLength);
+		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',playlist[index].img);
+		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+playlist[index].track).setData({index:index}).end().find(".artist-name").text(playlist[index].artist);
+		if (aC.autostart === true) triggerPlayPause(index);
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
@@ -115,7 +119,7 @@ niceDuration: function(a){
 	return 10 > b ? a + ":0" + b : a + ":" + b;
 },
 setDimensions: function(){
-	var w = $(window), height = w.height(), width = w.width();
+	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
 	aC.dimension = height - $(".player").outerHeight() - 1;
 	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(aC.dimension).add(".player").width(aC.dimension);
 	if (aC.dimension < width) {
@@ -126,66 +130,34 @@ setDimensions: function(){
 	} else { // bigger
 		//$("").width(width);
 	}
+	if ((rchrome.test(navigator.userAgent.toLowerCase()))) aC.showNotification("This website works best while using Google Chrome. Wise up!");
 },
-showNotificationBar: function(a){
-	$("#notifBar #message")[0].html(a);
+showNotification: function(a){
+	$("#notifBar #message").html(a);
 	$("#notifBar").animate({top: 0}, "fast");
 },
-hideNotificationBar: function(){
+hideNotification: function(){
 	$("#notifBar").animate({top: -80}, "fast");
+	$("#notifBar #message").empty();
 },
-changePlayModeForTrack: function(b){
-	var g = b.track, q = b.status;
-	clickedTrack = null;
-	trackId = getTrackId(g);
+handleTrack: function(){
+	var player = $(".player");
 	seekerInterval && (clearInterval(seekerInterval), seekerInterval = null);
 	durationTimer && (clearInterval(durationTimer), durationTimer = null);
-	$(".music-playing").removeClass("music-playing").addClass("music-paused");
-	g = $(".track-" + trackId);
-	if (0 < g.length && (q && ($(".player").removeClass("music-paused").addClass("music-playing"),
-	updateStatusBar(g)),
-	$(".active").removeClass("active"),
-	g.attr("class", q ? "track-" + trackId + " music-playing active item " + contextType : "track-" + trackId + " music-paused active item " + contextType),
-	g.each(function(b, g){
-		$(g)
-	}), q)) {
-		$("#engageView").removeClass("music-paused").addClass("music-playing");
-		var s = $(".player .meta .progress-bar-container .buffer").width(),
-			q = Number(g.attr("data-duration-ms")),
-			g = Math.floor(q / s);
-		$(".music-playing .seeker").width(Math.floor(s / q * 1E3 * b.playing_position));
-		seekerInterval = setInterval(function(){
-			var b = $(".music-playing .seeker").width();
-			b < s && $(".music-playing .seeker").width(b + 1)
-		}, g);
-		var p = 1E3 * b.playing_position;
-		$(".player .meta .progress-bar-container .time-spent")[0].innerHTML = readableTime(p);
-		durationTimer = setInterval(function(){
-			p = p + 1E3;
-			$(".player .meta .progress-bar-container .time-spent")[0].innerHTML = readableTime(p)
-		}, 1E3)
-	}
-},
-changeTrack: function(a){
-	seekerInterval && (clearInterval(seekerInterval), seekerInterval = null);
-	durationTimer && (clearInterval(durationTimer), durationTimer = null);
-	$(".on").removeClass("on").addClass("off");
-	$(".player").removeClass("off").addClass("on");
-		$("#engageView").removeClass("off").addClass("on");
-		var s = $(".player .meta .progress-bar-container .buffer").width(),
-			q = Number(aC.playlist[a].duration),
-			g = Math.floor(q / s);
-		$(".on .seeker").width(Math.floor(s / q * 1E3 * b.playing_position));
-		seekerInterval = setInterval(function(){
-			var b = $(".on .seeker").width();
-			b < s && $(".on .seeker").width(b+1);
-		}, g);
-		var p = 1E3 * b.playing_position;
-		$(".player .meta .progress-bar-container .time-spent")[0].html(readableTime(p));
-		durationTimer = setInterval(function(){
-			p = p + 1E3;
-			$(".player .meta .progress-bar-container .time-spent")[0].html(readableTime(p));
-		}, 1E3);
+	var s = player.find(".buffer").width(),
+		q = Number(aC.playlist[a].duration),
+		g = Math.floor(q / s);
+	$(".on .seeker").width(Math.floor(s / q * 1E3 * b.playing_position));
+	seekerInterval = setInterval(function(){
+		var b = $(".on .seeker").width();
+		b < s && $(".on .seeker").width(b+1);
+	}, g);
+	var p = 1E3 * b.playing_position;
+	player.find(".time-spent")[0].text(aC.niceDuration(p));
+	durationTimer = setInterval(function(){
+		p = p + 1E3;
+		player.find(".time-spent")[0].text(aC.niceDuration(p));
+	}, 1E3);
 },
 triggerPlayPause: function(a){
 	var player = $(".player");
@@ -201,7 +173,11 @@ triggerPlayPause: function(a){
 		}
 	} else {
 		aC.index = a;
-		aC.hideNotificationBar();
+		if (arguments[1] === "undefined") {
+			aC.history.push(a);
+			aC.historyPos = aC.history.length-1;
+		}
+		aC.hideNotification();
 		player.find(".time-spent").text("0:00");
 		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',aC.playlist[a].img);
 		player.find(".track-name").text((a+1)+'. '+aC.playlist[a].track).setData({index:a}).end().find(".artist-name").text(aC.playlist[a].artist);
@@ -220,18 +196,32 @@ triggerPlayPause: function(a){
 			player.find(".buffer").css('margin-left',4).width(aC.dimension - 171);
 		}
 		yt.loadAndPlayVideo(aC.playlist[a].id);
+		aC.handleTrack();
 	}
 },
 goNextVideo: function(){
 	var index = (aC.mode == "order") ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
 	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
+	aC.historyPos = aC.history.length-1;
 	aC.triggerPlayPause(index);
 },
 onKeyDown: function(e){
 	var keyCode = e.keyCode || e.which;
 	switch (keyCode) {
+		case keys.PLAY:
 		case keys.SPACE:
+		case keys.ENTER:
+		case keys.ENTER_OLD:
+		case keys.NUMPAD_ENTER_OLD:
+		case keys.PAUSE:
+		case keys.PAUSE_OLD:
 			aC.triggerPlayPause(aC.index);
+		break;
+		case keys.NEXT:
+			aC.goNextVideo();
+		break;
+		case keys.PREV:
+			if (aC.history.length > 1) aC.triggerPlayPause(aC.history[aC.historyPos],true);
 		break;
 	}
 }
@@ -242,7 +232,10 @@ $(document).ready(function(){
 	aC.setDimensions();
 	aC.checkPlaylist();
 	$("#notifBar .notifCloseButton").live('click',function(){
-		hideNotificationBar();
+		aC.hideNotification();
+	});
+	$("#config .closeButton").live('click',function(){
+		$("#config").animate({top: -80}, "fast");
 	});
 	$("#widgetContainer").hover(function(){
 		$(".player .meta .titles").animate({
@@ -253,7 +246,13 @@ $(document).ready(function(){
 			width: $(".player").width() - $('.player').outerHeight() - 8 - 8 - 19
 		}, 100)
 	});
-	$(".player .meta .right-bar-buttons .action-buttons-container .list").live('click',function(){
+	$(".player .config").live('click',function(){
+		$("#config").animate({top: 0}, "fast");
+	});
+	$(".player .meta .track-name").live('click',function(){
+		// scroll to this in list.
+	});
+	$(".player .meta .list").live('click',function(){
 		if (aC.playbackQuality == "small") aC.playbackQuality = "hd720";
 		else aC.playbackQuality = "small";
 		$("body").toggleClass("engage");
