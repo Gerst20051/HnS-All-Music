@@ -43,9 +43,11 @@ playbackQuality: "small",
 playerWidth: 720,
 playerHeight: 405,
 dimension: 0,
+history: [],
 playlist: [],
 playlistLength: 0,
 index: -1,
+mode: "order",
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
 		$(".player .album-art-container").setData({index:0}).find(".art").attr('src',playlist[0].img);
@@ -55,10 +57,11 @@ loadPlaylist: function(playlist){
 			if (typeof v == "object") {
 				var liclass="i p",
 					html = $("<div/>").attr('class','ppbtn'),
+					duration = $("<div/>").attr('class','d').text(aC.niceDuration(v.duration)),
 					itemlist = $("<ul/>").attr('class','ti'),
-					item = $('<li class="d">'+aC.niceDuration(v.duration)+'</li><li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>');
+					item = '<li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>';
 				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass = liclass + " un";
-				list.push($("<li/>").attr('class',liclass).setData(v).html(html).append(itemlist.append(item))[0]);
+				list.push($("<li/>").attr('class',liclass).setData(v).html(html).append(duration).append(itemlist.append(item))[0]);
 			}
 		});
 		$("#content").html(list);
@@ -255,7 +258,7 @@ function onYouTubePlayerReady(a){
 }
 
 function onPlayerStateChange(a){
-	if (a == 0) goNextVideo();
+	if (a == yt.ps.ended) goNextVideo();
 }
 
 function onPlayerError(a){
@@ -264,10 +267,20 @@ function onPlayerError(a){
 }
 
 function goNextVideo(){
-
+	var index = (aC.mode == "order") ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
+	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
+	triggerPlayPause(index);
 }
 
 yt={
+	ps: {
+		unstarted: -1,
+		ended: 0,
+		playing: 1,
+		paused: 2,
+		buffering: 3,
+		cued: 5
+	},
 	setQuality: function(a){if (ytplayer) ytplayer.setPlaybackQuality(a)},
 	loadAndPlayVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
 	loadVideo: function(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)},
