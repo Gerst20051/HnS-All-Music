@@ -37,6 +37,12 @@ overflow:hidden;
 position:absolute;
 }
 
+.engage #outerWidgetContainer {
+filter:alpha(opacity=30);
+-moz-opacity:.3;
+opacity:.3;
+}
+
 #widgetContainer {
 cursor:default;
 filter:alpha(opacity=0);
@@ -267,7 +273,8 @@ font-family:"lucida grande",tahoma,Verdana,Arial;
 color:#a1a1a1;
 }
 
-#widgetContainer:hover .player .meta .right-bar-buttons {
+#widgetContainer:hover .player .meta .right-bar-buttons,
+.engage .player .meta .right-bar-buttons {
 opacity:1;
 -moz-opacity:1;
 filter:alpha(opacity=100);
@@ -529,16 +536,20 @@ float:left;
 width:470px
 }
 
-.player .logo {
-background-image:url(i/icon.png);
+.player .config {
+background-image:url(i/config.png);
 background-repeat:no-repeat;
+background-size:22px 22px;
 cursor:pointer;
-width:27px;
-height:28px;
-position:absolute;
+filter:alpha(opacity=80);
 float:right;
-right:1px;
-top:51px;
+height:22px;
+-moz-opacity:.8;
+opacity:.8;
+position:absolute;
+right:7px;
+top:49px;
+width:22px;
 }
 
 #mainContainer {
@@ -595,8 +606,8 @@ transition-duration:.1s
 
 .i.un {
 cursor:default;
--moz-opacity:.5;
 filter:alpha(opacity=50);
+-moz-opacity:.5;
 opacity:.5;
 }
 

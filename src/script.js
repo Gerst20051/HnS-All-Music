@@ -1,12 +1,3 @@
-/* Body gets class engage when showing big album covers with slide */
-/* Toggle body class engage when right bar button is clicked */
-/* .music-playing and .music-paused classes get applied to .player and #engageView */
-/* .music-playing is also applied to that li item in the list all others have .music-paused class */
-
-/* Determine the pixel interval of change per second based off of the width of the buffer line */
-/* Skip back button is hidden by default and when the first song in list is playing */
-/* Slip forward button is shown by default and is hidden when the last song in list is playing. */
-
 $.fn.setData = function(obj){
 	if (typeof obj != "object") return this;
 	return this.each(function(){
@@ -36,12 +27,41 @@ function getRandomInt(min,max){
 Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
 Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
 
+window.keys = {
+DOWN_ARROW: 40,
+DOWN_ARROW_OLD: 63233,
+END: 35,
+END_OLD: 63275,
+ENTER: 13,
+ESCAPE: 27,
+HOME: 36,
+HOME_OLD: 63273,
+LEFT_ARROW: 37,
+LEFT_ARROW_OLD: 63234,
+NEXT: 176,
+NUMPAD_ENTER_OLD: 108,
+PAGE_DOWN: 34,
+PAGE_DOWN_OLD: 63277,
+PAGE_UP: 33,
+PAGE_UP_OLD: 63276,
+PAUSE: 19,
+PAUSE_OLD: 63250,
+PLAY: 179,
+PREV: 177,
+RIGHT_ARROW: 39,
+RIGHT_ARROW_OLD: 63235,
+SPACE: 32,
+TAB: 9,
+UP_ARROW: 38,
+UP_ARROW_OLD: 63232
+};
+
 (function(){
 aC = {
 devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
 playbackQuality: "small",
-playerWidth: 720,
-playerHeight: 405,
+playerWidth: 900,
+playerHeight: 506,
 dimension: 0,
 history: [],
 playlist: [],
@@ -201,19 +221,20 @@ triggerPlayPause: function(a){
 		}
 		yt.loadAndPlayVideo(aC.playlist[a].id);
 	}
-	/*
-	var clickedTrack = a;
-	setTimeout(function(){
-		if (clickedTrack) {
-			clickedTrack.attr("class", clickedTrack.attr("class") + " loading");
-			setTimeout(function(){
-				clickedTrack && clickedTrack.removeClass("loading")
-			}, 6E4);
-		}
-	}, 300);
-	playPauseTrack(a.attr("data-track"), a.attr("rel"), context);
-	return !1
-	*/
+},
+goNextVideo: function(){
+	var index = (aC.mode == "order") ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
+	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
+	aC.triggerPlayPause(index);
+},
+onKeyDown: function(e){
+	var keyCode = e.keyCode || e.which;
+	alert(keyCode);
+	switch (keyCode) {
+		case keys.SPACEBAR:
+			alert("pause");
+		break;
+	}
 }
 };
 })();
@@ -234,7 +255,8 @@ $(document).ready(function(){
 		}, 100)
 	});
 	$(".player .meta .right-bar-buttons .action-buttons-container .list").live('click',function(){
-		yt.setQuality("medium");
+		if (aC.playbackQuality == "small") aC.playbackQuality = "hd720";
+		else aC.playbackQuality = "small";
 		$("body").toggleClass("engage");
 		$("#vD").toggleClass("hidden");
 	});
@@ -248,7 +270,7 @@ $(document).ready(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
 		swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
 	})();
-});
+}).keydown(aC.onKeyDown);
 
 function onYouTubePlayerReady(a){
 	ytplayer = document.getElementById("ytplayer");
@@ -258,18 +280,12 @@ function onYouTubePlayerReady(a){
 }
 
 function onPlayerStateChange(a){
-	if (a == yt.ps.ended) goNextVideo();
+	if (a == yt.ps.ended) aC.goNextVideo();
 }
 
 function onPlayerError(a){
-	goNextVideo();
+	aC.goNextVideo();
 	console.log('Error! oPE Type: '+a);
-}
-
-function goNextVideo(){
-	var index = (aC.mode == "order") ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
-	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
-	triggerPlayPause(index);
 }
 
 yt={
@@ -280,6 +296,13 @@ yt={
 		paused: 2,
 		buffering: 3,
 		cued: 5
+	},
+	size: {
+		small: {h:240,w:320},
+		medium: {h:360,w:640},
+		large: {h:480,w:853},
+		hd720: {h:720,w:1280},
+		hd1080: {h:1080,w:1920}
 	},
 	setQuality: function(a){if (ytplayer) ytplayer.setPlaybackQuality(a)},
 	loadAndPlayVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
