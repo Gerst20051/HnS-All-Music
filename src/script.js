@@ -24,6 +24,10 @@ function getRandomInt(min,max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getHash(){ return decodeURIComponent(window.location.hash.substring(1)); }
+function clearHash(){ window.location.replace("#"); }
+function setHash(hash){ window.location.replace("#" + encodeURI(hash)); }
+
 Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
 Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
 
@@ -113,6 +117,15 @@ checkPlaylist: function(){
 		} else console.log("Error loading playlist");
 	});
 },
+checkHash: function(){
+	var hash = getHash();
+	for (var index in aC.playlist) {
+		if (aC.playlist[index].id == hash) {
+			
+		}
+	}
+	clearHash();
+},
 niceDuration: function(a){
 	var b = a / 60, a = Math.floor(b), b = Math.round(60 * (b - a));
 	60 == b && (a++, b = 0);
@@ -196,6 +209,7 @@ triggerPlayPause: function(a){
 			player.find(".buffer").css('margin-left',4).width(aC.dimension - 171);
 		}
 		yt.loadAndPlayVideo(aC.playlist[a].id);
+		setHash(aC.playlist[a].id);
 		aC.handleTrack();
 	}
 },
@@ -275,6 +289,7 @@ function onYouTubePlayerReady(a){
 	ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
 	ytplayer.addEventListener("onError", "onPlayerError");
 	$("#vD").center().addClass('hidden').css('visibility','visible');
+	aC.checkHash();
 }
 
 function onPlayerStateChange(a){

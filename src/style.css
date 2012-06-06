@@ -72,14 +72,14 @@ padding:0 40px;
 }
 
 #notifBar .notifCloseButton {
-background-image:url(i/closeBtn.png);
+background-image:url(i/closebtn.png);
 background-repeat:no-repeat;
 cursor:pointer;
-height:27px;
+height:15px;
 position:absolute;
 right:17px;
 top:17px;
-width:27px;
+width:15px;
 z-index:1;
 }
 
@@ -97,14 +97,14 @@ z-index:20;
 }
 
 #config .closeButton {
-background-image:url(i/closeBtn.png);
+background-image:url(i/closebtn.png);
 background-repeat:no-repeat;
 cursor:pointer;
-height:27px;
+height:15px;
 position:absolute;
 right:17px;
 top:17px;
-width:27px;
+width:15px;
 z-index:1;
 }
 
