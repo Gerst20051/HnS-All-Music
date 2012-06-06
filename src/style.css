@@ -49,41 +49,15 @@ filter:alpha(opacity=0);
 left:330px;
 -moz-opacity:0;
 opacity:0;
-opacity:1; /* fade in */
 position:absolute;
 top:0;
-}
-
-#notifBar {
-background-image:url(i/overlayBg.png);
-color:#fff;
-font-family:helvetica,"lucida grande",tahoma,verdana,arial;
-font-size:11px;
-height:80px;
-position:absolute;
-text-align:center;
-top:-80px;
-width:100%;
-z-index:20;
 }
 
 #notifBar p {
 padding:0 40px;
 }
 
-#notifBar .notifCloseButton {
-background-image:url(i/closebtn.png);
-background-repeat:no-repeat;
-cursor:pointer;
-height:15px;
-position:absolute;
-right:17px;
-top:17px;
-width:15px;
-z-index:1;
-}
-
-#config {
+.overlay {
 background-image:url(i/overlayBg.png);
 color:#fff;
 font-family:helvetica,"lucida grande",tahoma,verdana,arial;
@@ -96,7 +70,7 @@ width:100%;
 z-index:20;
 }
 
-#config .closeButton {
+.overlay .closeButton {
 background-image:url(i/closebtn.png);
 background-repeat:no-repeat;
 cursor:pointer;
@@ -108,13 +82,11 @@ width:15px;
 z-index:1;
 }
 
-.closeButton:hover,
-.notifCloseButton:hover {
+.closeButton:hover {
 background-position:-16px 0;
 }
 
-.closeButton:active,
-.notifCloseButton:active {
+.closeButton:active {
 background-position:-32px 0;
 }
 
@@ -152,7 +124,7 @@ width:78px;
 height:78px;
 }
 
-.player .album-art-container .album-art {
+.player .album-art {
 margin-left:5px;
 margin-top:5px;
 width:68px;
@@ -175,7 +147,7 @@ border-bottom-right-radius:3px;
 border:0;
 }
 
-.player .album-art-container .album-art img {
+.player .album-art img {
 width:66px;
 height:66px;
 border-top:1px solid #4D4D4D;
@@ -197,16 +169,16 @@ border-bottom-left-radius:3px;
 border-bottom-right-radius:3px;
 -moz-border-radius-bottomright:3px;
 -webkit-border-bottom-right-radius:3px;
-background-image: url(i/defaultCoverL.png);
+background-image: url(i/defaultCover.png);
 background-repeat:no-repeat;
 background-size:66px 66px;
 }
 
-.engage .player .album-art-container .album-art img {
+.engage .player .album-art img {
 display:none;
 }
 
-.player .album-art-container .album-art .play-pause-btn {
+.player .album-art .play-pause-btn {
 cursor:pointer;
 width:29px;
 height:29px;
@@ -217,7 +189,7 @@ background-repeat:no-repeat;
 background-image:url(i/playbtnsSmall.png);
 }
 
-.engage .player .album-art-container .album-art .play-pause-btn {
+.engage .player .album-art .play-pause-btn {
 width:50px;
 height:51px;
 position:relative;
@@ -227,48 +199,44 @@ background-repeat:no-repeat;
 background-image:url(i/PlayPause.png);
 }
 
-.player.off .album-art-container .album-art .play-pause-btn {
+.player.off .album-art .play-pause-btn {
 background-position:0 0;
 }
 
-.player.off .album-art-container .album-art:hover .play-pause-btn {
+.player.off .album-art:hover .play-pause-btn {
 background-position:-30px 0;
 }
 
-.player.on .album-art-container .album-art .play-pause-btn {
+.player.on .album-art .play-pause-btn {
 background-position:-60px 0;
 }
 
-.player.on .album-art-container .album-art:hover .play-pause-btn {
+.player.on .album-art:hover .play-pause-btn {
 background-position:-90px 0;
 }
 
-.player.on .album-art-container .album-art:hover .play-pause-btn {
+.player.on .album-art:hover .play-pause-btn {
 background-position:-90px 0;
 }
 
-.engage .player.on .album-art-container .album-art:hover .play-pause-btn {
-background-position:-204px 0;
-}
-
-.engage .player.on .album-art-container .album-art:active .play-pause-btn {
-background-position:-255px 0;
-}
-
-.engage .player.off .album-art-container .album-art:hover .play-pause-btn {
-background-position:-51px 0;
-}
-
-.engage .player.off .album-art-container .album-art:active .play-pause-btn {
-background-position:-102px 0;
-}
-
-.engage .player.on .album-art-container .album-art .play-pause-btn {
+.engage .player.on .album-art .play-pause-btn {
 background-position:-153px 0;
 }
 
-.engage .player.on .album-art-container .album-art:hover .play-pause-btn {
+.engage .player.on .album-art:hover .play-pause-btn {
 background-position:-204px 0;
+}
+
+.engage .player.on .album-art:active .play-pause-btn {
+background-position:-255px 0;
+}
+
+.engage .player.off .album-art:hover .play-pause-btn {
+background-position:-51px 0;
+}
+
+.engage .player.off .album-art:active .play-pause-btn {
+background-position:-102px 0;
 }
 
 .player .divider {
@@ -298,6 +266,7 @@ width:477px;
 }
 
 .player .meta .titles .track-name {
+cursor:pointer;
 font-weight:bold;
 }
 
