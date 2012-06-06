@@ -42,16 +42,18 @@ devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9Db
 playbackQuality: "small",
 playerWidth: 720,
 playerHeight: 405,
+dimension: 0,
 playlist: [],
+playlistLength: 0,
 index: -1,
 loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
-		$(".player .album-art .art").attr('src',playlist[0].img).setData({index:0});
+		$(".player .album-art-container").setData({index:0}).find(".art").attr('src',playlist[0].img);
 		$(".player .meta .titles").find(".track-name").text('1. '+playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
-				var liclass="off i p",
+				var liclass="i p",
 					html = $("<div/>").attr('class','ppbtn'),
 					itemlist = $("<ul/>").attr('class','ti'),
 					item = $('<li class="d">'+aC.niceDuration(v.duration)+'</li><li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>');
@@ -68,15 +70,17 @@ checkPlaylist: function(){
 	if (sls()) {
 		if (localStorage.getItem('playlist')){
 			aC.playlist = $.parseJSON(localStorage.getItem('playlist'));
-			if ($.isArray(aC.playlist)) aC.loadPlaylist(aC.playlist);
+			aC.playlistLength = aC.playlist.length;
+			if ($.isArray(aC.playlist) && aC.playlistLength > 0) aC.loadPlaylist(aC.playlist);
 			else console.log("Error loading local playlist");
 		}
 	}
 	$.getJSON("playlist.json", function(a){
-		if ($.isArray(a.data)) {
+		if ($.isArray(a.data) && a.data.length > 0) {
 			localStorage['playlist'] = JSON.stringify(a.data);
-			if (!$.isArray(aC.playlist) && aC.playlist.length > 0) {
+			if (!$.isArray(aC.playlist) || aC.playlistLength == 0) {
 				aC.playlist = a.data;
+				aC.playlistLength = aC.playlist.length;
 				aC.loadPlaylist(aC.playlist);
 			}
 		} else console.log("Error loading playlist");
@@ -89,13 +93,13 @@ niceDuration: function(a){
 },
 setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width();
-	var dimension = height - $(".player").outerHeight() - 1;
-	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(dimension).add(".player").width(dimension);
-	if (dimension < width) {
+	aC.dimension = height - $(".player").outerHeight() - 1;
+	$("#mainContainer,.jspContainer,.jspPane,.jspTrack").height(aC.dimension).add(".player").width(aC.dimension);
+	if (aC.dimension < width) {
 		$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
-		$(".player .meta .progress-bar-container").width(dimension - 123);
-		$(".player .meta .progress-bar-container .controls .buffer").width(dimension - 171);
-		$(".ti").width(dimension - 31); /* not updating */
+		$(".player .meta .progress-bar-container").width(aC.dimension - 123);
+		$(".player .meta .progress-bar-container .controls .buffer").width(aC.dimension - 171);
+		$(".ti").width(aC.dimension - 31); /* not updating */
 	} else { // bigger
 		//$("").width(width);
 	}
@@ -160,16 +164,39 @@ changeTrack: function(a){
 			$(".player .meta .progress-bar-container .time-spent")[0].html(readableTime(p));
 		}, 1E3);
 },
-triggerPlayPause: function(a){ /* Pass Index */
-	if (a == aC.index) { /* pause */
-		
-	} else { /* play this song */
-		$(".player .meta .controls .time-spent").text("0:00");
+triggerPlayPause: function(a){
+	var player = $(".player");
+	if (a == aC.index) {
+		if (player.hasClass("on")) {
+			player.removeClass("on").addClass("off");
+			$("#content").find(".i").eq(a).removeClass("on").addClass("off");
+			yt.pauseVideo();
+		} else {
+			player.removeClass("off").addClass("on");
+			$("#content").find(".i").eq(a).removeClass("off").addClass("on");
+			yt.playVideo();
+		}
+	} else {
+		aC.index = a;
 		aC.hideNotificationBar();
-		$(".player .meta .progress-bar-container .controls .buffer").width($(this).width() - 16);
-		if (a > 1) $(".player .meta .progress-bar-container .controls .buffer").css('margin-left',1);
-		console.log(a);
-			
+		player.find(".time-spent").text("0:00");
+		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',aC.playlist[a].img);
+		player.find(".track-name").text((a+1)+'. '+aC.playlist[a].track).setData({index:a}).end().find(".artist-name").text(aC.playlist[a].artist);
+		player.removeClass("off").addClass("on");
+		$("#content").find(".i").removeClass("on").eq(a).addClass("on");
+		if (a > 0) {
+			if (a == aC.playlistLength-1) {
+				player.find(".buffer").css('margin-left',1).width(aC.dimension - 171);
+				player.find(".skip-fwd").hide().end().find(".skip-back").show();
+			} else {
+				player.find(".buffer").css('margin-left',1).width(aC.dimension - 187);
+				player.find(".skip-back").show().end().find(".skip-fwd").show();
+			}
+		} else {
+			player.find(".skip-back").hide().end().find(".skip-fwd").show();
+			player.find(".buffer").css('margin-left',4).width(aC.dimension - 171);
+		}
+		yt.loadAndPlayVideo(aC.playlist[a].id);
 	}
 	/*
 	var clickedTrack = a;
@@ -204,14 +231,15 @@ $(document).ready(function(){
 		}, 100)
 	});
 	$(".player .meta .right-bar-buttons .action-buttons-container .list").live('click',function(){
+		yt.setQuality("medium");
 		$("body").toggleClass("engage");
 		$("#vD").toggleClass("hidden");
 	});
-	$(".player .album-art-container").live('click',function(a){
-		//aC.triggerPlayPause($(this).data('index'));
+	$(".player .album-art-container").live('click',function(){
+		aC.triggerPlayPause($(this).data('index'));
 	});
-	$("#content").on('click','.i',function(a){
-		//aC.triggerPlayPause($(this).data('index'));
+	$("#content").on('click','.i',function(){
+		aC.triggerPlayPause($(this).index());
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
@@ -239,17 +267,19 @@ function goNextVideo(){
 
 }
 
-function setQuality(a){if (ytplayer) ytplayer.setPlaybackQuality(a)}
-function loadAndPlayVideo(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)}
-function loadVideo(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)}
-function playVideo(){if (ytplayer) ytplayer.playVideo()}
-function pauseVideo(){if (ytplayer) ytplayer.pauseVideo()}
-function stopVideo(){if (ytplayer) ytplayer.stopVideo()}
-function setVolume(v){if (ytplayer) ytplayer.setVolume(v)}
-function getDuration(){if (ytplayer) return ytplayer.getDuration()}
-function getCurrentTime(){if (ytplayer) return ytplayer.getCurrentTime()}
-function setSize(w,h){if (ytplayer) return ytplayer.setSize(w,h)}
-function seekTo(s){if (ytplayer) return ytplayer.seekTo(s,false)}
+yt={
+	setQuality: function(a){if (ytplayer) ytplayer.setPlaybackQuality(a)},
+	loadAndPlayVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
+	loadVideo: function(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)},
+	playVideo: function(){if (ytplayer) ytplayer.playVideo()},
+	pauseVideo: function(){if (ytplayer) ytplayer.pauseVideo()},
+	stopVideo: function(){if (ytplayer) ytplayer.stopVideo()},
+	setVolume: function(v){if (ytplayer) ytplayer.setVolume(v)},
+	getDuration: function(){if (ytplayer) return ytplayer.getDuration()},
+	getCurrentTime: function(){if (ytplayer) return ytplayer.getCurrentTime()},
+	setSize: function(w,h){if (ytplayer) return ytplayer.setSize(w,h)},
+	seekTo: function(s){if (ytplayer) return ytplayer.seekTo(s,false)}
+};
 
 tfObjSort={
 	init:function(){

@@ -21,10 +21,6 @@ margin:0;
 padding:0;
 }
 
-.clickable {
-cursor:pointer;
-}
-
 .ellipsis {
 overflow:hidden;
 -o-text-overflow:ellipsis;
@@ -109,6 +105,7 @@ border-bottom-right-radius:0;
 }
 
 .player .album-art-container {
+cursor:pointer;
 display:inline-block;
 float:left;
 width:78px;
@@ -170,6 +167,7 @@ display:none;
 }
 
 .player .album-art-container .album-art .play-pause-btn {
+cursor:pointer;
 width:29px;
 height:29px;
 position:relative;
@@ -418,6 +416,7 @@ display:block;
 }
 
 .player .meta .progress-bar-container .controls .skip-back {
+cursor:pointer;
 display:none;
 float:left;
 width:19px;
@@ -478,6 +477,7 @@ border-bottom-right-radius:1px;
 }
 
 .player .meta .progress-bar-container .controls .skip-fwd {
+cursor:pointer;
 float:left;
 width:19px;
 height:16px;
@@ -532,6 +532,7 @@ width:470px
 .player .logo {
 background-image:url(i/icon.png);
 background-repeat:no-repeat;
+cursor:pointer;
 width:27px;
 height:28px;
 position:absolute;
@@ -597,6 +598,11 @@ cursor:default;
 -moz-opacity:.5;
 filter:alpha(opacity=50);
 opacity:.5;
+}
+
+.i.on,
+.i.off {
+background-color:#292929;
 }
 
 .ppbtn {
