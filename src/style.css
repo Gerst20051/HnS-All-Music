@@ -592,6 +592,13 @@ transition-property:background-color;
 transition-duration:.1s
 }
 
+.i.un {
+cursor:default;
+-moz-opacity:.5;
+filter:alpha(opacity=50);
+opacity:.5;
+}
+
 .ppbtn {
 display:inline-block;
 position:absolute;
@@ -671,7 +678,7 @@ white-space:nowrap;
 visibility:hidden;
 }
 
-#vD .hidden {
+#vD.hidden {
 height:0;
 overflow:hidden;
 width:0;

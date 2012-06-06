@@ -39,6 +39,7 @@ Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)];
 (function(){
 aC = {
 devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
+playbackQuality: "small",
 playerWidth: 720,
 playerHeight: 405,
 playlist: [],
@@ -47,14 +48,15 @@ loadPlaylist: function(playlist){
 	if (playlist.length > 0) {
 		$(".player .album-art .art").attr('src',playlist[0].img).setData({index:0});
 		$(".player .meta .titles").find(".track-name").text('1. '+playlist[0].track).setData({index:0}).end().find(".artist-name").text(playlist[0].artist);
-		alert($(".track-name").data('index'));
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
-				var html = $("<div/>").attr('class','ppbtn'),
+				var liclass="off i p",
+					html = $("<div/>").attr('class','ppbtn'),
 					itemlist = $("<ul/>").attr('class','ti'),
 					item = $('<li class="d">'+aC.niceDuration(v.duration)+'</li><li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>');
-				list.push($("<li/>").attr('class','off i p').setData(v).html(html).append(itemlist.append(item))[0]);
+				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass = liclass + " un";
+				list.push($("<li/>").attr('class',liclass).setData(v).html(html).append(itemlist.append(item))[0]);
 			}
 		});
 		$("#content").html(list);
@@ -202,11 +204,14 @@ $(document).ready(function(){
 			width: $(".player").width() - $('.player').outerHeight() - 8 - 8 - 19
 		}, 100)
 	});
+	$(".player .meta .right-bar-buttons .action-buttons-container .list").live('click',function(){
+		$("#vD").toggleClass("hidden");
+	});
 	$(".player .album-art-container").live('click',function(a){
-		aC.triggerPlayPause($(this).data('index'));
+		//aC.triggerPlayPause($(this).data('index'));
 	});
 	$("#content").on('click','.i',function(a){
-		aC.triggerPlayPause($(this).data('index'));
+		//aC.triggerPlayPause($(this).data('index'));
 	});
 });
 
@@ -220,7 +225,7 @@ function onYouTubePlayerReady(a){
 	ytplayer = document.getElementById("ytplayer");
 	ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
 	ytplayer.addEventListener("onError", "onPlayerError");
-	$("#vD").center().addClass('hidden');
+	$("#vD").center().addClass('hidden').css('visibility','visible');
 }
 
 function onPlayerStateChange(a){
@@ -232,19 +237,13 @@ function onPlayerError(a){
 	console.log('Error! oPE Type: '+a);
 }
 
-
 function goNextVideo(){
 
 }
 
-function loadAndPlayVideo(a){
-	if (ytplayer){
-		ytplayer.loadVideoById(a[0]);
-		currentVideoId = a[0];
-	}
-}
-
-function loadVideo(a){if (ytplayer){ytplayer.cueVideoById(a);currentVideoId=a}}
+function setQuality(a){if (ytplayer) ytplayer.setPlaybackQuality(a)}
+function loadAndPlayVideo(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)}
+function loadVideo(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)}
 function playVideo(){if (ytplayer) ytplayer.playVideo()}
 function pauseVideo(){if (ytplayer) ytplayer.pauseVideo()}
 function stopVideo(){if (ytplayer) ytplayer.stopVideo()}
