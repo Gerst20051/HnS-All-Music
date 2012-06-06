@@ -75,7 +75,7 @@ checkPlaylist: function(){
 	$.getJSON("playlist.json", function(a){
 		if ($.isArray(a.data)) {
 			localStorage['playlist'] = JSON.stringify(a.data);
-			if (!$.isArray(aC.playlist)) {
+			if (!$.isArray(aC.playlist) && aC.playlist.length > 0) {
 				aC.playlist = a.data;
 				aC.loadPlaylist(aC.playlist);
 			}
@@ -191,7 +191,6 @@ triggerPlayPause: function(a){ /* Pass Index */
 $(document).ready(function(){
 	aC.setDimensions();
 	aC.checkPlaylist();
-	loadPlayer();
 	$("#notifBar .notifCloseButton").live('click',function(){
 		hideNotificationBar();
 	});
@@ -205,6 +204,7 @@ $(document).ready(function(){
 		}, 100)
 	});
 	$(".player .meta .right-bar-buttons .action-buttons-container .list").live('click',function(){
+		$("body").toggleClass("engage");
 		$("#vD").toggleClass("hidden");
 	});
 	$(".player .album-art-container").live('click',function(a){
@@ -213,13 +213,11 @@ $(document).ready(function(){
 	$("#content").on('click','.i',function(a){
 		//aC.triggerPlayPause($(this).data('index'));
 	});
+	(function(){
+		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
+		swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
+	})();
 });
-
-function loadPlayer(){
-	var a = {allowScriptAccess: "always"};
-	var b = {id: "ytplayer"};
-	swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
-}
 
 function onYouTubePlayerReady(a){
 	ytplayer = document.getElementById("ytplayer");
