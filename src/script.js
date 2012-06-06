@@ -229,10 +229,9 @@ goNextVideo: function(){
 },
 onKeyDown: function(e){
 	var keyCode = e.keyCode || e.which;
-	alert(keyCode);
 	switch (keyCode) {
-		case keys.SPACEBAR:
-			alert("pause");
+		case keys.SPACE:
+			aC.triggerPlayPause(aC.index);
 		break;
 	}
 }
