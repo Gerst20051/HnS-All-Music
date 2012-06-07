@@ -6,8 +6,12 @@
 user-select:none;
 }
 
+html,
 body {
-background:#333332;
+background-color:#333332;
+}
+
+body {
 color:#fff;
 font-family:HelveticaNeue,Helvetica,"lucida grande",tahoma,Verdana,Arial;
 font-size:12px;
@@ -701,7 +705,7 @@ white-space:nowrap;
 visibility:hidden;
 }
 
-#vD.hidden {
+#vD.hide {
 height:0;
 overflow:hidden;
 width:0;
