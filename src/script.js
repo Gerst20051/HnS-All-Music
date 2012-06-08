@@ -46,13 +46,12 @@ loadPlaylist: function(playlist){
 	} else console.log('Playlist is empty');
 },
 checkPlaylist: function(){
-	if (sls()) {
-		if (localStorage.getItem('playlist')){
-			aC.playlist = $.parseJSON(localStorage.getItem('playlist'));
-			aC.playlistLength = aC.playlist.length;
-			if ($.isArray(aC.playlist) && aC.playlistLength > 0) aC.loadPlaylist(aC.playlist);
-			else console.log("Error loading local playlist");
-		}
+	var playlist = localStorage.getItem('playlist');
+	if (sls() && Object.toType(playlist != "null")) {
+		aC.playlist = $.parseJSON(playlist);
+		aC.playlistLength = aC.playlist.length;
+		if ($.isArray(aC.playlist) && aC.playlistLength > 0) aC.loadPlaylist(aC.playlist);
+		else console.log("Error loading local playlist");
 	}
 	$.getJSON("playlist.json", function(a){
 		if ($.isArray(a.data) && a.data.length > 0) {
@@ -119,7 +118,10 @@ setPlayerDimensions: function(){
 	}
 },
 loadSettings: function(){
-	
+	var settings = localStorage.getItem('settings');
+	if (sls() && Object.toType(settings) != "null") {
+		aC.settings = $.parseJSON(settings);
+	}
 },
 showNotification: function(a){
 	$("#notifBar #message").html(a);
@@ -275,6 +277,7 @@ $(document).ready(function(){
 		} else {
 			$("#"+id+" .off").attr('class','on').text('On');
 		}
+		localStorage['settings'] = JSON.stringify(aC.settings);
 	});
 	$("#widgetContainer").hover(function(){
 		$(".player .meta .titles").animate({
