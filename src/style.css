@@ -571,12 +571,12 @@ color:#a1a1a1;
 font-family:"lucida grande",tahoma,verdana,arial;
 font-size:11px;
 margin-right:4px;
-padding-top:2px 0 0 4px;
+padding:2px 0 0 4px;
 text-shadow:#000 0 1px 1px;
 }
 
 .p .player .meta .progress-bar-container .context-title .type-icon {
-background-position:-11px 0;
+background-position:-11px 1px;
 }
 
 .player .meta .progress-bar-container .context-title .type-icon {
@@ -584,7 +584,7 @@ background-image:url(i/typeicons.png);
 background-repeat:no-repeat;
 float:left;
 height:10px;
-padding-top:2px 4px 0 0;
+padding:2px 4px 0 0;
 width:10px;
 }
 

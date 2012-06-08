@@ -235,6 +235,9 @@ onKeyDown: function(e){
 			if ($("#search").offset().top == 0) $("#search .closeButton").click();
 			if ($("#notifBar").offset().top == 0) aC.hideNotification();
 		break;
+		case /[a-z]/.test(String.fromCharCode(e.which)):
+			alert(String.fromCharCode(e.which));
+		break;
 	}
 },
 doSearch: function(){
