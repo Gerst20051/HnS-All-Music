@@ -36,7 +36,11 @@ Object.toType = (function toType(global){
 })(this);
 
 function sls(){
-	return ('localStorage' in window) && window['localStorage'] !== null;
+	try {
+		return 'localStorage' in window && window['localStorage'] !== null;
+	} catch (e) {
+		return false;
+	}
 }
 
 function getRandomInt(min,max){
