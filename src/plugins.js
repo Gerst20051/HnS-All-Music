@@ -166,8 +166,8 @@ yt={
 		hd1080: {h:1080,w:1920}
 	},
 	setQuality: function(a){if (ytplayer) ytplayer.setPlaybackQuality(a)},
-	loadAndPlayVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
-	loadVideo: function(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)},
+	loadVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
+	cueVideo: function(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)},
 	playVideo: function(){if (ytplayer) ytplayer.playVideo()},
 	pauseVideo: function(){if (ytplayer) ytplayer.pauseVideo()},
 	stopVideo: function(){if (ytplayer) ytplayer.stopVideo()},
