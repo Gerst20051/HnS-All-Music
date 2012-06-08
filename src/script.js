@@ -151,14 +151,7 @@ handleTrack: function(){
 	var b = seeker.width(), p = yt.getCurrentTime(), q = Number(aC.playlist[aC.index].duration)*1E3, g = Math.floor(q/s);
 	if (aC.settings.express === true && p < 29) p = 29;
 	if (arguments.length == 1) {
-		var w = b = arguments[0];
-		alert(w);
-		alert(g);
-		var seek = w*g/1E3;
-		console.log('seek',seek);
-		p = g*w/1E3;
-		console.log('p',p);
-		console.log('target',Math.floor(s/q*p*1E3));
+		var w = b = arguments[0], seek = w*g/1E3, p = g*w/1E3;
 		yt.seekTo(seek);
 	} else var w = b = Math.floor(s/q*p*1E3);
 	seeker.width(w);
@@ -264,9 +257,18 @@ onKeyDown: function(e){
 		default:
 			var key = String.fromCharCode(e.which);
 			if (/[A-Z]/.test(key)) {
-				// scroll to letter
+				var playlist = aC.playlist;
+				for (index in playlist) {
+					//if (playlist[index].
+				}
 			} else if (/\d/.test(key)) {
-				// scroll to top
+				var jsp = $('.jspScrollable').data('jsp'), offset = $("#content").find(".i").filter(":last").offset().top-$(".player").outerHeight();
+				if (key == 1) jsp.scrollToY(0);
+				else if (key == 0) jsp.scrollToY(offset);
+				else {
+					var increment = offset/9;
+					jsp.scrollToY(increment*key);
+				}
 			}
 		break;
 	}
@@ -335,8 +337,8 @@ $(document).ready(function(){
 		$("#config").animate({top: 0}, "fast");
 	});
 	$(".player .meta .track-name").live('click',function(){
-		var offset = $("#content").find(".i").eq(aC.index).offset();
-		$('.jspScrollable').data('jsp').scrollToY(offset.top-$(".player").outerHeight());
+		var offset = $("#content").find(".i").eq(aC.index).offset().top;
+		$('.jspScrollable').data('jsp').scrollToY(offset-$(".player").outerHeight());
 	});
 	$(".player .meta .embed").live('click',function(){
 		$("#search").animate({top: 0}, "fast");
