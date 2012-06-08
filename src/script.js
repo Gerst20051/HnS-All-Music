@@ -48,12 +48,12 @@ checkPlaylist: function(){
 	if (sls() && Object.toType(playlist != "null")) {
 		playlist = aC.playlist = $.parseJSON(playlist);
 		aC.playlistLength = playlist.length;
-		if ($.isArray(playlist) && aC.playlistLength > 0) aC.loadPlaylist(playlist);
+		if ($.isArray(playlist) && 0 < aC.playlistLength) aC.loadPlaylist(playlist);
 		else console.log("Error loading local playlist");
 	}
 	$.getJSON("playlist.json", function(a){
 		var data = a.data;
-		if ($.isArray(data) && data.length > 0) {
+		if ($.isArray(data) && 0 < data.length) {
 			localStorage['playlist'] = JSON.stringify(data);
 			if (!$.isArray(aC.playlist) || aC.playlistLength == 0) {
 				aC.playlist = data;
