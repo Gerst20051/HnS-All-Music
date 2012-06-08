@@ -94,6 +94,28 @@ background-position:-16px 0;
 background-position:-32px 0;
 }
 
+#sB {
+background-color:#333;
+border:2px solid #999;
+-khtml-border-radius:5px;
+-moz-border-radius:5px;
+-opera-border-radius:5px;
+-webkit-border-radius:5px;
+border-radius:5px;
+color:#fff;
+font-size:20px;
+height:30px;
+margin-top:35px;
+outline:0;
+padding:0 35px 0 4px;
+width:310px;
+}
+
+#sB:focus,
+#sB:hover {
+border-color:#fff;
+}
+
 .player {
 background:-moz-linear-gradient(top,#333332 0,#272626 100%);
 background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#333332),color-stop(100%,#272626));

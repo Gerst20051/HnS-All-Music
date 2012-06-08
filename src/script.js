@@ -265,8 +265,7 @@ goNextVideo: function(){
 	else aC.triggerPlayPause(index, true);
 },
 onKeyDown: function(e){
-	var keyCode = e.keyCode || e.which;
-	switch (keyCode) {
+	switch (e.which) {
 		case keys.PLAY:
 		case keys.SPACE:
 		case keys.ENTER:
@@ -293,6 +292,9 @@ onKeyDown: function(e){
 			if ($("#notifBar").offset().top == 0) aC.hideNotification();
 		break;
 	}
+},
+doSearch: function(){
+	alert("search");
 }
 };
 })();
@@ -303,6 +305,7 @@ $(window).resize(function(){
 $(document).ready(function(){
 	aC.setDimensions();
 	aC.checkPlaylist();
+	$("#sB").keyup(aC.doSearch);
 	$("#notifBar .closeButton").live('click',function(){
 		aC.hideNotification();
 	});
@@ -344,10 +347,15 @@ $(document).ready(function(){
 		aC.triggerPlayPause($(this).index());
 	});
 	$(".player .skip-back").live('click',function(){
-		alert('back');
+		aC.goPrevVideo();
 	});
 	$(".player .skip-fwd").live('click',function(){
 		aC.goNextVideo();
+	});
+	$(".player .buffer").live('click',function(e){
+		var x = e.pageX - this.offsetLeft;
+		var y = e.pageY - this.offsetTop;
+		alert(x +', '+ y);
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
