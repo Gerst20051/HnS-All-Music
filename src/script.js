@@ -12,8 +12,9 @@ historyPos: -1,
 playlist: [],
 playlistLength: 0,
 index: -1,
-resizeTO: false,
+search: "",
 searchFocus: false,
+resizeTO: false,
 settings: {
 	random: true,
 	express: true,
@@ -232,8 +233,9 @@ onKeyDown: function(e){
 	}
 },
 doSearch: function(){
-	var val = $.trim($("#sB").value());
-	if (0 < val.length) {
+	var val = $.trim($("#sB").val());
+	if (0 < val.length && val != aC.search) {
+		aC.search = val;
 		alert(val);
 	}
 }
@@ -303,9 +305,8 @@ $(document).ready(function(){
 		aC.goNextVideo();
 	});
 	$(".player .buffer").live('click',function(e){
-		var x = e.pageX - this.offsetLeft;
-		var y = e.pageY - this.offsetTop;
-		alert(x +', '+ y);
+		var x = e.pageX - $(this).offset().left;
+		alert(x);
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
