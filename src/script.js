@@ -121,6 +121,9 @@ loadSettings: function(){
 	var settings = localStorage.getItem('settings');
 	if (sls() && Object.toType(settings) != "null") {
 		aC.settings = $.parseJSON(settings);
+		for (id in aC.settings) {
+			if (aC.settings[id] === false) $("#"+id+" .on").attr('class','off').text('Off');
+		}
 	}
 },
 showNotification: function(a){
