@@ -52,10 +52,11 @@ checkPlaylist: function(){
 		else console.log("Error loading local playlist");
 	}
 	$.getJSON("playlist.json", function(a){
-		if ($.isArray(a.data) && a.data.length > 0) {
-			localStorage['playlist'] = JSON.stringify(a.data);
+		var data = a.data;
+		if ($.isArray(data) && data.length > 0) {
+			localStorage['playlist'] = JSON.stringify(data);
 			if (!$.isArray(aC.playlist) || aC.playlistLength == 0) {
-				aC.playlist = a.data;
+				aC.playlist = data;
 				aC.playlistLength = aC.playlist.length;
 				aC.loadPlaylist(aC.playlist);
 			}
@@ -80,9 +81,10 @@ checkHash: function(){
 		if (0 < hash.length) clearHash();
 		$('#widgetContainer').animate({opacity:1});
 		var index = (aC.settings.random === false) ? 0 : getRandomInt(0,aC.playlistLength);
-		while (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
-		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',aC.playlist[index].img);
-		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+aC.playlist[index].track).setData({index:index}).end().find(".artist-name").text(aC.playlist[index].artist);
+		while (playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
+		var item = aC.playlist[index];
+		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',item.img);
+		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+item.track).setData({index:index}).end().find(".artist-name").text(item.artist);
 		if (aC.settings.autostart === true) {
 			aC.triggerPlayPause(index);
 			$('.player .meta .track-name').click();
@@ -97,13 +99,13 @@ niceDuration: function(a){
 },
 setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
-	aC.dimension = height - $(".player").outerHeight() - 1;
-	$("#mainContainer").height(aC.dimension).add(".player").add(".overlay").width(aC.dimension);
+	var dimension = aC.dimension = height - $(".player").outerHeight() - 1;
+	$("#mainContainer").height(dimension).add(".player").add(".overlay").width(dimension);
 	$("#widgetContainer").css("left",(w.width() - $("#widgetContainer").outerWidth()) / 2);
-	$(".player .meta .progress-bar-container").width(aC.dimension - 123);
-	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(aC.dimension - 187);
-	else $(".player .meta .controls .buffer").width(aC.dimension - 171);
-	$(".ti").width(aC.dimension - 74);
+	$(".player .meta .progress-bar-container").width(dimension - 123);
+	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension - 187);
+	else $(".player .meta .controls .buffer").width(dimension - 171);
+	$(".ti").width(dimension - 74);
 	if (arguments.length == 1) {
 		setTimeout(function(){
 			aC.setPlayerDimensions();
@@ -111,7 +113,10 @@ setDimensions: function(){
 			$(".jspPane").width($(".jspContainer").width());
 		},1000);
 	}
-	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) aC.showNotification("This website works best while using Google Chrome. Wise up!");
+	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) {
+		aC.showNotification("This website works best while using Google Chrome. Wise up!");
+		alert("Please Use Google Chrome. Wise Up!");
+	}
 },
 setPlayerDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width();
@@ -160,8 +165,8 @@ handleTrack: function(){
 	}, 1E3);
 },
 triggerPlayPause: function(a){
-	var player = $(".player");
-	while (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (index+1) : getRandomInt(0,aC.playlistLength);
+	while (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
+	var player = $(".player"), item = aC.playlist[a], pid = item.id;
 	if (a == aC.index && arguments.length == 1) {
 		if (player.hasClass("on")) {
 			player.removeClass("on").addClass("off");
@@ -175,15 +180,15 @@ triggerPlayPause: function(a){
 			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",210000-yt.getCurrentTime()*1E3);
 		}
 	} else {
-		aC.index = a;
 		if (arguments.length == 1) {
 			aC.history.push(a);
 			aC.historyPos = aC.history.length-1;
 		}
+		aC.index = a;
 		aC.hideNotification();
 		player.find(".time-spent").text("0:00");
-		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',aC.playlist[a].img);
-		player.find(".track-name").text((a+1)+'. '+aC.playlist[a].track).setData({index:a}).end().find(".artist-name").text(aC.playlist[a].artist);
+		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',item.img);
+		player.find(".track-name").text((a+1)+'. '+item.track).setData({index:a}).end().find(".artist-name").text(item.artist);
 		player.removeClass("off").addClass("on");
 		$("#content").find(".i").removeClass("on").eq(a).addClass("on");
 		if (a > 0) {
@@ -198,13 +203,13 @@ triggerPlayPause: function(a){
 			player.find(".skip-back").hide().end().find(".skip-fwd").show();
 			player.find(".buffer").css('margin-left',4).width(aC.dimension - 171);
 		}
-		var pid = aC.playlist[a].id;
-		yt.loadAndPlayVideo(pid);
+		
 		if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 		if (aC.settings.express === true) {
-			setTimeout("yt.seekTo(30)",1000);
+			yt.cueVideo(pid);
+			yt.seekTo(30);
 			aC.expressTO = setTimeout("aC.goNextVideo()",210000);
-		}
+		} else yt.loadVideo(pid);
 		setHash(pid);
 		//aC.handleTrack();
 	}
