@@ -147,7 +147,6 @@ handleTrack: function(){
 		q = Number(aC.playlist[a].duration),
 		g = Math.floor(q / s);
 	console.log('s',s,'q',q,'g',g);
-	/*
 	var p = yt.getCurrentTime();
 	$(".on .seeker").width(Math.floor(s / q * 1E3 * p));
 	seekerInterval = setInterval(function(){
@@ -159,7 +158,6 @@ handleTrack: function(){
 		p = p + 1;
 		player.find(".time-spent")[0].text(aC.niceDuration(p));
 	}, 1E3);
-	*/
 },
 triggerPlayPause: function(a){
 	var player = $(".player");
@@ -169,10 +167,12 @@ triggerPlayPause: function(a){
 			player.removeClass("on").addClass("off");
 			$("#content").find(".i").eq(a).removeClass("on").addClass("off");
 			yt.pauseVideo();
+			if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 		} else {
 			player.removeClass("off").addClass("on");
 			$("#content").find(".i").eq(a).removeClass("off").addClass("on");
 			yt.playVideo();
+			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",210000-yt.getCurrentTime()*1E3);
 		}
 	} else {
 		aC.index = a;
@@ -215,8 +215,8 @@ goPrevVideo: function(){
 goNextVideo: function(){
 	var index = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
 	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
-	if (arguments.length == 1) aC.triggerPlayPause(index);
-	else aC.triggerPlayPause(index, true);
+	if (arguments.length == 1) aC.triggerPlayPause(index, true);
+	else aC.triggerPlayPause(index);
 },
 onKeyDown: function(e){
 	if (aC.searchFocus === true) return;
@@ -306,7 +306,7 @@ $(document).ready(function(){
 			if (aC.settings.express === true) {
 				aC.expressTO = setTimeout("aC.goNextVideo()",210000-yt.getCurrentTime()*1E3);
 			} else {
-				if (aC.expressTO !== null) clearTimeout(aC.expressTO) && aC.expressTO = null;
+				if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 			}
 		}
 	});
@@ -349,7 +349,7 @@ $(document).ready(function(){
 	});
 	$(".player .buffer").live('click',function(e){
 		var x = e.pageX - $(this).offset().left;
-		s(x);
+		alert(x);
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
