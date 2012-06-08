@@ -1,4 +1,4 @@
-* {
+*:not {
 -khtml-user-select:none;
 -moz-user-select:none;
 -o-user-select:none;
@@ -58,7 +58,7 @@ top:0;
 }
 
 #notifBar p {
-padding:0 40px;
+padding:30px 40px 0;
 }
 
 .overlay {
@@ -108,7 +108,12 @@ height:30px;
 margin-top:35px;
 outline:0;
 padding:0 35px 0 4px;
-width:310px;
+-khtml-user-select:text;
+-moz-user-select:text;
+-o-user-select:text;
+-webkit-user-select:text;
+user-select:text;
+width:350px;
 }
 
 #sB:focus,
