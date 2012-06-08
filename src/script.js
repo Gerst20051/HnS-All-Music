@@ -81,7 +81,7 @@ checkHash: function(){
 		if (0 < hash.length) clearHash();
 		$('#widgetContainer').animate({opacity:1});
 		var index = (aC.settings.random === false) ? 0 : getRandomInt(0,aC.playlistLength);
-		while (playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
+		while (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
 		var item = aC.playlist[index];
 		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',item.img);
 		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+item.track).setData({index:index}).end().find(".artist-name").text(item.artist);
@@ -145,22 +145,29 @@ hideNotification: function(){
 	$("#notifBar #message").empty();
 },
 handleTrack: function(){
-	var player = $(".player");
-	aC.seekerInterval && (clearInterval(aC.seekerInterval), aC.seekerInterval = null);
-	aC.durationTimer && (clearInterval(aC.durationTimer), aC.durationTimer = null);
-	var s = player.find(".buffer").width(),
-		q = Number(aC.playlist[a].duration),
-		g = Math.floor(q/s);
-	console.log('s',s,'q',q,'g',g);
-	var p = yt.getCurrentTime();
-	$(".on .seeker").width(Math.floor(s/q*1E3*p));
-	seekerInterval = setInterval(function(){
-		var b = $(".on .seeker").width();
-		b < s && $(".on .seeker").width(b+1);
+	if (aC.seekerInterval !== null) clearInterval(aC.seekerInterval), aC.seekerInterval = null;
+	if (aC.durationInterval !== null) clearInterval(aC.durationInterval), aC.durationInterval = null;
+	var player = $(".player.on"), seeker = player.find(".seeker"), s = player.find(".buffer").width();
+	var b = seeker.width(), p = yt.getCurrentTime(), q = Number(aC.playlist[aC.index].duration)*1E3, g = Math.floor(q/s);
+	if (aC.settings.express === true && p < 29) p = 29;
+	if (arguments.length == 1) {
+		var w = b = arguments[0];
+		alert(w);
+		alert(g);
+		var seek = w*g/1E3;
+		console.log('seek',seek);
+		p = g*w/1E3;
+		console.log('p',p);
+		console.log('target',Math.floor(s/q*p*1E3));
+		yt.seekTo(seek);
+	} else var w = b = Math.floor(s/q*p*1E3);
+	seeker.width(w);
+	aC.seekerInterval = setInterval(function(){
+		b < s && seeker.width(++b)
 	}, g);
-	player.find(".time-spent")[0].text(aC.niceDuration(p));
-	durationTimer = setInterval(function(){
-		player.find(".time-spent")[0].text(aC.niceDuration(++p));
+	player.find(".time-spent").text(aC.niceDuration(--p));
+	aC.durationInterval = setInterval(function(){
+		player.find(".time-spent").text(aC.niceDuration(++p));
 	}, 1E3);
 },
 triggerPlayPause: function(a){
@@ -185,6 +192,7 @@ triggerPlayPause: function(a){
 		}
 		aC.index = a;
 		aC.hideNotification();
+		player.find(".seeker").width(0);
 		player.find(".time-spent").text("0:00");
 		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',item.img);
 		player.find(".track-name").text((a+1)+'. '+item.track).setData({index:a}).end().find(".artist-name").text(item.artist);
@@ -210,8 +218,8 @@ triggerPlayPause: function(a){
 			aC.expressTO = setTimeout("aC.goNextVideo()",210000);
 		} else yt.loadVideo(pid);
 		setHash(pid);
-		//aC.handleTrack();
 	}
+	aC.handleTrack();
 },
 goPrevVideo: function(){
 	if (1 < aC.history.length && 0 < aC.historyPos) aC.triggerPlayPause(aC.history[aC.historyPos--],true);
@@ -353,7 +361,7 @@ $(document).ready(function(){
 	});
 	$(".player .buffer").live('click',function(e){
 		var x = e.pageX-$(this).offset().left;
-		alert(x);
+		aC.handleTrack(x);
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
