@@ -81,7 +81,7 @@ checkHash: function(){
 		if (0 < hash.length) clearHash();
 		$('#widgetContainer').animate({opacity:1});
 		var index = (aC.settings.random === false) ? 0 : getRandomInt(0,aC.playlistLength);
-		while (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
+		if (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
 		var item = aC.playlist[index];
 		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',item.img);
 		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+item.track).setData({index:index}).end().find(".artist-name").text(item.artist);
@@ -164,7 +164,7 @@ handleTrack: function(){
 	}, 1E3);
 },
 triggerPlayPause: function(a){
-	while (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
+	if (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
 	var player = $(".player"), item = aC.playlist[a], pid = item.id;
 	if (a == aC.index && arguments.length == 1) {
 		if (player.hasClass("on")) {
@@ -219,7 +219,7 @@ goPrevVideo: function(){
 },
 goNextVideo: function(){
 	var index = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
-	while (index == aC.index) index = getRandomInt(0,aC.playlistLength);
+	if (index == aC.index) index = getRandomInt(0,aC.playlistLength);
 	if (arguments.length == 1) aC.triggerPlayPause(index, true);
 	else aC.triggerPlayPause(index);
 },
