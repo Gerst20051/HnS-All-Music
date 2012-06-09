@@ -165,6 +165,7 @@ yt={
 		hd720: {h:720,w:1280},
 		hd1080: {h:1080,w:1920}
 	},
+	devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
 	setQuality: function(a){if (ytplayer) ytplayer.setPlaybackQuality(a)},
 	loadVideo: function(a){if (ytplayer) ytplayer.loadVideoById(a,aC.playbackQuality)},
 	cueVideo: function(a){if (ytplayer) ytplayer.cueVideoById(a,aC.playbackQuality)},

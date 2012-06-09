@@ -1,6 +1,5 @@
 (function(){
 aC = {
-devkey: "AI39si6-KJa9GUrvoNKGEh0rZWfJ2yFrPOxIN79Svnz9zAhosYHrbZfpADwJhd3v6TNl9DbvTtUS_deOcoNCodgvTqq3kxcflw",
 playbackQuality: "small",
 playerHeight: 506,
 newPlayerHeight: 0,
@@ -21,6 +20,7 @@ durationInterval: null,
 settings: {
 	random: true,
 	express: true,
+	playtime: 210,
 	autostart: true
 },
 loadPlaylist: function(playlist){
@@ -45,7 +45,7 @@ loadPlaylist: function(playlist){
 },
 checkPlaylist: function(){
 	var playlist = localStorage.getItem('playlist');
-	if (sls() && Object.toType(playlist != "null")) {
+	if (sls() && Object.toType(playlist) != "null") {
 		playlist = aC.playlist = $.parseJSON(playlist);
 		aC.playlistLength = playlist.length;
 		if ($.isArray(playlist) && 0 < aC.playlistLength) aC.loadPlaylist(playlist);
@@ -57,7 +57,7 @@ checkPlaylist: function(){
 			localStorage['playlist'] = JSON.stringify(data);
 			if (!$.isArray(aC.playlist) || aC.playlistLength == 0) {
 				aC.playlist = data;
-				aC.playlistLength = aC.playlist.length;
+				aC.playlistLength = data.length;
 				aC.loadPlaylist(data);
 			}
 		} else console.log("Error loading playlist");
@@ -176,7 +176,7 @@ triggerPlayPause: function(a){
 			player.removeClass("off").addClass("on");
 			$("#content").find(".i").eq(a).removeClass("off").addClass("on");
 			yt.playVideo();
-			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",210000-yt.getCurrentTime()*1E3);
+			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3-yt.getCurrentTime()*1E3);
 		}
 	} else {
 		if (arguments.length == 1) {
@@ -208,7 +208,7 @@ triggerPlayPause: function(a){
 		if (aC.settings.express === true) {
 			yt.cueVideo(pid);
 			yt.seekTo(30);
-			aC.expressTO = setTimeout("aC.goNextVideo()",210000);
+			aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3);
 		} else yt.loadVideo(pid);
 		setHash(pid);
 	}
@@ -318,7 +318,7 @@ $(document).ready(function(){
 		localStorage['settings'] = JSON.stringify(aC.settings);
 		if (id == "express") {
 			if (aC.settings.express === true) {
-				aC.expressTO = setTimeout("aC.goNextVideo()",210000-yt.getCurrentTime()*1E3);
+				aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3-yt.getCurrentTime()*1E3);
 			} else {
 				if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 			}
@@ -367,7 +367,7 @@ $(document).ready(function(){
 	});
 	(function(){
 		var a = {allowScriptAccess: "always"}, b = {id: "ytplayer"};
-		swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+aC.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
+		swfobject.embedSWF("http://www.youtube.com/apiplayer?version=3&enablejsapi=1&playerapiid=ytplayer&key="+yt.devkey, "iVD", aC.playerWidth, aC.playerHeight, "8", null, null, a, b);
 	})();
 }).keydown(aC.onKeyDown);
 
