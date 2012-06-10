@@ -1,8 +1,8 @@
-HnS All Music
+HnS Music Discovery
 ========  
 
-HnS All Music is a playlist based music listening and discovery engine.
+HnS Music Discovery is a playlist based music listening and discovery engine.
 -------------------------------
-[HnS All Music](http://hns.netai.net/allmusic/) 
+[HnS Music Discovery](http://music.hns.netai.net/) 
 
 `Creator: Andrew Gerst`
