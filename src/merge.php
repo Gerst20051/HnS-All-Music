@@ -5,7 +5,7 @@ $f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true;
 /***** List of Manual Edits *******/
 /*********************************/
 /* Forever The Sickest Kids - Whoa Oh! (Me vs Everyone)
-/*** Forever The Sickest Kids - Whoa Oh! (Me vs Everyone) feat. Selena Gomez
+/*** {"id":"hbD6480kBYE","artist":"Forever The Sickest Kids","track":"Whoa Oh! (Me vs Everyone) feat. Selena Gomez","img":"http://i.ytimg.com/vi/hbD6480kBYE/default.jpg","duration":211}
 /*********************************/
 
 if ($newplaylist === true) {
