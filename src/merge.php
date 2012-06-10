@@ -1,17 +1,16 @@
 <?php
-$f = file('playlist.txt'); $l = (count($f) - 1); $writetofile = true; $clean = true; $newplaylist = false;
+$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = false;
 
 /*********************************/
-/***** List of Manual Edits  *******/
+/***** List of Manual Edits *******/
 /*********************************/
 /* Forever The Sickest Kids - Whoa Oh! (Me vs Everyone)
 /*** Forever The Sickest Kids - Whoa Oh! (Me vs Everyone) feat. Selena Gomez
-/* 
 /*********************************/
 
 if ($newplaylist === true) {
 function clean($s){
-	$s = preg_replace('/\s[\s]+/',' ',$s);
+	$s = preg_replace('/\s[\s]+/', ' ', $s);
 	$s = str_replace(array("à","á","â","ã","å","ä","æ"), 'a', $s);
 	$s = str_replace(array("è","é","ê","ë"), 'e', $s);
 	$s = str_replace(array("ì","í","î","ï"), 'i', $s);
@@ -28,9 +27,9 @@ $playlist = array('data'=>array());
 for ($k = 0; $k <= $l; $k++) {
 	if ($clean) $s = clean($f[$k]);
 	else $s = $f[$k];
-	$s = explode(' - ', $s);
+	$s = explode(' - ',$s);
 	$artist = array_shift($s);
-	$track = trim(implode(" - ", $s));
+	$track = trim(implode(' - ',$s));
 	$item = array('id'=>'','artist'=>$artist,'track'=>$track,'img'=>'','duration'=>0);
 	array_push($playlist['data'],$item);
 }
@@ -49,20 +48,20 @@ foreach($oldjson as $oldkey=>$olditem) {
 $playlist['data'] = $newjson;
 
 $data = json_encode($playlist);
-if ($writetofile){
-$f="newplaylist.json";
-if (is_writable($f)) {
-	if (!$handle = fopen($f, 'w')) {
-		 echo "Cannot open file ($f)";
-		 exit;
-	}
-	if (fwrite($handle, $data) === false) {
-		echo "Cannot write to file ($f)";
-		exit;
-	}
-	echo "Success, wrote data to file ($f)";
-	fclose($handle);
-} else echo "The file $f is not writable";
+if ($writetofile === true) {
+	$f="newplaylist.json";
+	if (is_writable($f)) {
+		if (!$handle = fopen($f, 'w')) {
+			 echo "Cannot open file ($f)";
+			 exit;
+		}
+		if (fwrite($handle, $data) === false) {
+			echo "Cannot write to file ($f)";
+			exit;
+		}
+		echo "Success, wrote data to file ($f)";
+		fclose($handle);
+	} else echo "The file $f is not writable";
 }
 } else {
 ?>
@@ -75,7 +74,7 @@ if (is_writable($f)) {
 <body>
 <div id="count"></div>
 <script>
-var all = true, run = -1, steps = 200, dlen = APP.data.length-1, reps = 0, run = (100 * reps) - 1;
+var all = true, run = -1, steps = 200, dlen = APP.data.length-1, reps = 0, run = (100*reps)-1;
 if (all === true) var end = dlen; else end = run+steps+1;
 
 function init(){
