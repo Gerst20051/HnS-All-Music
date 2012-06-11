@@ -1,11 +1,15 @@
 <?php
-$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = false;
+header("Pragma: no-cache");
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = true;
 
 /*********************************/
 /***** List of Manual Edits *******/
 /*********************************/
 /* Forever The Sickest Kids - Whoa Oh! (Me vs Everyone)
 /*** {"id":"hbD6480kBYE","artist":"Forever The Sickest Kids","track":"Whoa Oh! (Me vs Everyone) feat. Selena Gomez","img":"http://i.ytimg.com/vi/hbD6480kBYE/default.jpg","duration":211}
+/* Mike Posner - Bow Chicka Wow Wow ft. Lil Wayne feat. Lil Wayne
 /*********************************/
 
 if ($newplaylist === true) {
