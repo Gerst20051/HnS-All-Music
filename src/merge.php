@@ -2,7 +2,7 @@
 header("Pragma: no-cache");
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = true;
+$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = false;
 
 /*********************************/
 /***** List of Manual Edits *******/
@@ -10,6 +10,13 @@ $f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true;
 /* Forever The Sickest Kids - Whoa Oh! (Me vs Everyone)
 /*** {"id":"hbD6480kBYE","artist":"Forever The Sickest Kids","track":"Whoa Oh! (Me vs Everyone) feat. Selena Gomez","img":"http://i.ytimg.com/vi/hbD6480kBYE/default.jpg","duration":211}
 /* Mike Posner - Bow Chicka Wow Wow ft. Lil Wayne feat. Lil Wayne
+/*** Mike Posner - Bow Chicka Wow Wow feat. Lil Wayne
+/* Busta Rhymes & Mariah Carey (- I Know What You Want(feat. Flipmode Squad)
+/*** {"id":"6-126gvOxKw","artist":"Busta Rhymes & Mariah Carey","track":"I Know What You Want (feat. Flipmode Squad)","img":"http://i.ytimg.com/vi/6-126gvOxKw/default.jpg","duration":261}
+/* {"id":"","artist":"Reel 2 Real","track":null,"img":"","duration":0}
+/*** {"id":"M1S6Xw_xLUg","artist":"Reel 2 Real","track":"I Like to Move It - Erick \"More\" Club Mix","img":"http://i.ytimg.com/vi/tX6h_hWnI60/default.jpg","duration":231}
+/* {"id":"TEiBDI220HY","artist":"The Bellamy Brothers","track":null,"img":"http://i.ytimg.com/vi/TEiBDI220HY/default.jpg","duration":338}
+/*** {"id":"TEiBDI220HY","artist":"The Bellamy Brothers","track":"If I Said You Had A Beautiful Body (Would You Hold It Against Me)","img":"http://i.ytimg.com/vi/TEiBDI220HY/default.jpg","duration":338}
 /*********************************/
 
 if ($newplaylist === true) {
@@ -21,7 +28,7 @@ function clean($s){
 	$s = str_replace(array("ò","ó","ô","õ","ö","ø"), 'o', $s);
 	$s = str_replace(array("ù","ú","û","ü"), 'u', $s);
 	$s = str_replace(array("À","Á","Â","Ã","Ä","Å"), 'A', $s);
-	$s = str_replace(array("ÿ","ý","ñ","ç","Ç","ß","Ž","¥","É","Ë","Í","°","º","×","¡","’","´","–","–","—","\"","½","²","·"), array("y","y","n","c","C","B","Z","Y","E","E","I"," Degrees"," Degrees"," x ","!","'","'","-","-","-","'","1/2","2","."), $s);
+	$s = str_replace(array("ÿ","ý","ñ","ç","Ç","ß","Ž","¥","É","Ë","Í","°","º","×","¡","’","´","–","–","—","½","²","·"), array("y","y","n","c","C","B","Z","Y","E","E","I"," Degrees"," Degrees"," x ","!","'","'","-","-","-","1/2","2","."), $s);
 	$s = str_replace(array("(-","( "," )","()"), array("(","(",")",""), $s);
 	$s = str_replace(array("Featuring","featuring","Feat.","Feat","feat","feat.."), 'feat.', $s);
 	return $s;

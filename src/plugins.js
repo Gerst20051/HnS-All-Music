@@ -178,3 +178,5 @@ yt={
 	setSize: function(w,h){if (ytplayer) return ytplayer.setSize(w,h)},
 	seekTo: function(s){if (ytplayer) return ytplayer.seekTo(s,false)}
 };
+
+(function(){window._gaq=[['_setAccount','UA-32560649-1'],['_setDomainName','hns.netai.net'],['_trackPageview']];var a=document.createElement('script');a.type='text/javascript';a.async=true;a.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(a,s)})();

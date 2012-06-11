@@ -57,6 +57,8 @@ padding:30px 40px 0;
 
 .overlay {
 background-image:url(i/overlayBg.png);
+border-left:1px solid #000;
+border-right:1px solid #000;
 color:#fff;
 font-family:helvetica,"lucida grande",tahoma,verdana,arial;
 font-size:11px;
@@ -89,6 +91,15 @@ background-position:-16px 0;
 background-position:-32px 0;
 }
 
+#sresultcount {
+font-size:13pt;
+left:72px;
+position:absolute;
+text-align:right;
+top:43px;
+width:50px;
+}
+
 #sB {
 background-color:#333;
 border:2px solid #999;
@@ -102,7 +113,7 @@ font-size:20px;
 height:30px;
 margin-top:35px;
 outline:0;
-padding:0 35px 0 4px;
+padding-left:4px;
 -khtml-user-select:text;
 -moz-user-select:text;
 -o-user-select:text;
@@ -116,38 +127,70 @@ width:350px;
 border-color:#fff;
 }
 
-#settings {
-left:10px;
+#config .content > ul {
 position:absolute;
 top:12px;
 }
 
-#settings > li > div {
+#settings1 {
+left:15px;
+}
+
+#settings2 {
+left:92px;
+}
+
+#settings3 {
+left:210px;
+}
+
+#config ul > li > div {
 cursor:pointer;
 }
 
-#settings > li:not(:first-child) > div {
+#config ul > li:not(:first-child) > div {
 margin-top:6px;
 }
 
-#settings > li :first-child {
+#config ul > li :first-child {
 float:left;
 margin-right:5px;
 text-align:right;
 width:50px;
 }
 
-#settings > li :last-child {
+#config ul#settings2 > li :first-child {
+float:left;
+margin-right:5px;
+text-align:right;
+width:85px;
+}
+
+#config ul > li :last-child {
 float:left;
 text-align:left;
 width:20px;
 }
 
-#settings .on {
+#config ul#settings2 > li :last-child {
+width:50px;
+}
+
+#config ul > li#starttime :last-child,
+#config ul > li#playtime :last-child {
+cursor:text;
+outline:0;
+-khtml-user-select:text;
+-moz-user-select:text;
+-o-user-select:text;
+-webkit-user-select:text;
+}
+
+#config ul .on {
 color:#0f0;
 }
 
-#settings .off {
+#config ul .off {
 color:#f00;
 }
 
@@ -671,6 +714,13 @@ opacity:.5;
 .i.on,
 .i.off {
 background-color:#292929;
+}
+
+.i.none {
+cursor:default;
+font-size:14pt;
+padding-top:12px;
+text-align:center;
 }
 
 .ppbtn {

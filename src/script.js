@@ -1,39 +1,60 @@
 (function(){
 aC = {
-playbackQuality: "small",
 playerHeight: 506,
 newPlayerHeight: 0,
 playerWidth: 900,
 newPlayerWidth: 0,
 dimension: 0,
+index: -1,
 history: [],
 historyPos: -1,
 playlist: [],
 playlistLength: 0,
-index: -1,
 search: "",
+searchResults: [],
+searchLength: 0,
 searchFocus: false,
+starttimeFocus: false,
+playtimeFocus: false,
 resizeTO: null,
 expressTO: null,
 seekerInterval: null,
 durationInterval: null,
+qualityChanged: false,
 settings: {
 	random: true,
 	express: true,
-	playtime: 210,
-	autostart: true
+	autostart: true,
+	order: "artist",
+	starttime: 30,
+	playtime: 160,
+	quality: "small"
+},
+searchPlaylist: function(a,b){
+	var retArr = [];
+	if (typeof a === 'string') a = eval(a);
+	$.each(b, function(i,v){
+		if (typeof v['id'] !== "string" || typeof v['artist'] !== "string" || typeof v['track'] !== "string") return;
+		var artist = v['artist'].replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' ');
+		var track = v['track'].replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' ');
+		if (artist.match(a) || track.match(a)) retArr.push(i);
+	});
+	aC.searchLength = retArr.length;
+	return retArr;
 },
 loadPlaylist: function(playlist){
 	if (0 < playlist.length) {
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
-				var liclass="i p",
+				var liclass="i",
 					html = $("<div/>").attr('class','ppbtn'),
 					duration = $("<div/>").attr('class','d').text(aC.niceDuration(v.duration)),
 					itemlist = $("<ul/>").attr('class','ti'),
 					item = '<li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>';
-				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass = liclass + " un";
+				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass += " un";
+				if (0 < aC.searchLength && i == $.inArray(aC.index,aC.searchResults)) liclass += " on";
+				else if (i == aC.index) liclass += " on";
 				list.push($("<li/>").attr('class',liclass).setData(v).html(html).append(duration).append(itemlist.append(item))[0]);
 			}
 		});
@@ -41,7 +62,12 @@ loadPlaylist: function(playlist){
 		$(".ti").width(aC.dimension-74);
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
-	} else console.log('Playlist is empty');
+	} else {
+		if (0 < aC.playlist.length) {
+			$("#sresultcount").empty();
+			$("#content").html($("<li/>").attr('class','i none').text('No Search Results'));
+		} else console.log('Playlist is empty');
+	}
 },
 checkPlaylist: function(){
 	var playlist = localStorage.getItem('playlist');
@@ -93,9 +119,11 @@ checkHash: function(){
 	}
 },
 niceDuration: function(a){
-	var b = a/60, a = Math.floor(b), b = Math.round(60*(b-a));
-	60 == b && (a++, b = 0);
-	return 10 > b ? a + ":0" + b : a + ":" + b;
+	if (0 < a) {
+		var b = a/60, a = Math.floor(b), b = Math.round(60*(b-a));
+		60 == b && (a++, b = 0);
+		return 10 > b ? a + ":0" + b : a + ":" + b;
+	} else return "0:00";
 },
 setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
@@ -149,7 +177,7 @@ handleTrack: function(){
 	if (aC.durationInterval !== null) clearInterval(aC.durationInterval), aC.durationInterval = null;
 	var player = $(".player.on"), seeker = player.find(".seeker"), s = player.find(".buffer").width();
 	var b = seeker.width(), p = yt.getCurrentTime(), q = Number(aC.playlist[aC.index].duration)*1E3, g = Math.floor(q/s);
-	if (aC.settings.express === true && p < 29) p = 29;
+	if (aC.settings.express === true && p < aC.settings.starttime-1) p = aC.settings.starttime-1;
 	if (arguments.length == 1) {
 		var w = b = arguments[0], seek = w*g/1E3, p = g*w/1E3;
 		yt.seekTo(seek);
@@ -163,18 +191,19 @@ handleTrack: function(){
 		player.find(".time-spent").text(aC.niceDuration(++p));
 	}, 1E3);
 },
-triggerPlayPause: function(a){
+triggerPlayPause: function(i){
+	if (aC.searchLength > 0) var a = aC.searchResults[i]; else var a = i;
 	if (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
 	var player = $(".player"), item = aC.playlist[a], pid = item.id;
 	if (a == aC.index && arguments.length == 1) {
 		if (player.hasClass("on")) {
 			player.removeClass("on").addClass("off");
-			$("#content").find(".i").eq(a).removeClass("on").addClass("off");
+			$("#content").find(".i").eq(i).removeClass("on").addClass("off");
 			yt.pauseVideo();
 			if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 		} else {
 			player.removeClass("off").addClass("on");
-			$("#content").find(".i").eq(a).removeClass("off").addClass("on");
+			$("#content").find(".i").eq(i).removeClass("off").addClass("on");
 			yt.playVideo();
 			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3-yt.getCurrentTime()*1E3);
 		}
@@ -190,7 +219,7 @@ triggerPlayPause: function(a){
 		player.find(".album-art-container").setData({index:a}).find(".art").attr('src',item.img);
 		player.find(".track-name").text((a+1)+'. '+item.track).setData({index:a}).end().find(".artist-name").text(item.artist);
 		player.removeClass("off").addClass("on");
-		$("#content").find(".i").removeClass("on").eq(a).addClass("on");
+		$("#content").find(".i").removeClass("on").eq(i).addClass("on");
 		if (a > 0) {
 			if (a == aC.playlistLength-1) {
 				player.find(".buffer").css('margin-left',1).width(aC.dimension-171);
@@ -207,7 +236,7 @@ triggerPlayPause: function(a){
 		if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 		if (aC.settings.express === true) {
 			yt.cueVideo(pid);
-			yt.seekTo(30);
+			yt.seekTo(aC.settings.starttime);
 			aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3);
 		} else yt.loadVideo(pid);
 		setHash(pid);
@@ -224,7 +253,7 @@ goNextVideo: function(){
 	else aC.triggerPlayPause(index);
 },
 onKeyDown: function(e){
-	if (aC.searchFocus === true) return;
+	if (aC.searchFocus === true || aC.starttimeFocus === true || aC.playtimeFocus === true) return;
 	switch (e.which) {
 		case keys.PLAY:
 		case keys.SPACE:
@@ -273,10 +302,69 @@ onKeyDown: function(e){
 		break;
 	}
 },
+doStarttimeKeys: function(e){
+	var key = String.fromCharCode(e.which);
+	if (!/\d/.test(key)) {
+		switch (e.which) {
+			case keys.BACKSPACE:
+			case keys.DELETE:
+			case keys.LEFT_ARROW:
+			case keys.RIGHT_ARROW:
+			case keys.LEFT_ARROW2:
+			case keys.RIGHT_ARROW2:
+				return true;
+			break;
+			default:
+				return false;
+			break;
+		}
+	} else {
+		if ($(this).html().length >= 3) return false;
+	}
+	aC.settings.starttime = parseInt($(this).html());
+	localStorage['settings'] = JSON.stringify(aC.settings);
+	return false;
+},
+doPlaytimeKeys: function(e){
+	var key = String.fromCharCode(e.which);
+	if (!/\d/.test(key)) {
+		switch (e.which) {
+			case keys.BACKSPACE:
+			case keys.DELETE:
+			case keys.LEFT_ARROW:
+			case keys.RIGHT_ARROW:
+			case keys.LEFT_ARROW2:
+			case keys.RIGHT_ARROW2:
+				return true;
+			break;
+			default:
+				return false;
+			break;
+		}
+	} else {
+		if ($(this).html().length >= 3) return false;
+	}
+	aC.settings.playtime = parseInt($(this).html());
+	localStorage['settings'] = JSON.stringify(aC.settings);
+	return false;
+},
 doSearch: function(){
-	var val = $.trim($("#sB").val());
-	if (0 < val.length && val != aC.search) {
+	var val = $.trim($("#sB").val().replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' '));
+	if (1 < val.length && val != search) {
 		aC.search = val;
+		var rlength = aC.searchLength;
+		aC.searchResults = aC.searchPlaylist("/" + aC.search + "/i", aC.playlist);
+		if (aC.searchLength > 0) $("#sresultcount").text(aC.searchLength);
+		if (rlength != aC.searchLength) {
+			aC.loadPlaylist($.grep(aC.playlist, function(v,i){
+				return $.inArray(i,aC.searchResults) > -1;
+			}));
+		}			
+	} else if (0 == val.length) {
+		aC.search = "";
+		aC.searchLength = 0;
+		$("#sresultcount").empty();
+		aC.loadPlaylist(aC.playlist);
 	}
 }
 };
@@ -307,7 +395,7 @@ $(document).ready(function(){
 	$("#config .closeButton").live('click',function(){
 		$("#config").animate({top: -80}, "fast");
 	});
-	$("#settings").on('click','li',function(){
+	$("#config ul").on('click','.setting',function(){
 		var id = $(this).attr('id');
 		aC.settings[id] = !aC.settings[id];
 		if (aC.settings[id] === false) {
@@ -324,6 +412,55 @@ $(document).ready(function(){
 			}
 		}
 	});
+	$("#config #quality").live('click',function(){
+		aC.qualityChanged = true;
+		if (aC.settings["quality"] == "small") {
+			aC.settings["quality"] = "medium";
+			$("#quality .on").text('Medium');
+		} else if (aC.settings["quality"] == "medium") {
+			aC.settings["quality"] = "large";
+			$("#quality .on").text('Large');
+		} else if (aC.settings["quality"] == "large") {
+			aC.settings["quality"] = "hd720";
+			$("#quality .on").text('HD 720');
+		} else if (aC.settings["quality"] == "hd720") {
+			aC.settings["quality"] = "hd1080";
+			$("#quality .on").text('HD 1080');
+		} else {
+			aC.settings["quality"] = "small";
+			$("#quality .on").text('Small');
+		}
+		localStorage['settings'] = JSON.stringify(aC.settings);
+	});
+	$("#config #sort").live('click',function(){
+		if (aC.settings["sort"] == "artist") {
+			aC.settings["sort"] = "track";
+			$("#sort .on").text('Track');
+		} else if (aC.settings["sort"] == "track") {
+			aC.settings["sort"] = "random";
+			$("#sort .on").text('Random');
+		} else {
+			aC.settings["sort"] = "artist";
+			$("#sort .on").text('Artist');
+		}
+		localStorage['settings'] = JSON.stringify(aC.settings);
+	});
+	$("#starttime").live('click',function(){
+		$("#starttime .on").focus();
+	});
+	$("#starttime .on").live('focus',function(){
+		aC.starttimeFocus = true;
+	}).live('blur',function(){
+		aC.starttimeFocus = false;
+	}).keyup(aC.doStarttimeKeys);
+	$("#playtime").live('click',function(){
+		$("#playtime .on").focus();
+	});
+	$("#playtime .on").live('focus',function(){
+		aC.playtimeFocus = true;
+	}).live('blur',function(){
+		aC.playtimeFocus = false;
+	}).keyup(aC.doPlaytimeKeys);
 	$("#widgetContainer").hover(function(){
 		$(".player .meta .titles").animate({
 			width: $(".player").width()-$('.player').outerHeight()-8-$(".right-bar-buttons").width()-8
@@ -337,15 +474,18 @@ $(document).ready(function(){
 		$("#config").animate({top: 0}, "fast");
 	});
 	$(".player .meta .track-name").live('click',function(){
+		var coffset = Math.abs($("#content").offset().top);
 		var offset = $("#content").find(".i").eq(aC.index).offset().top;
-		$('.jspScrollable').data('jsp').scrollToY(offset-$(".player").outerHeight());
+		$('.jspScrollable').data('jsp').scrollByY(offset-coffset);
 	});
 	$(".player .meta .embed").live('click',function(){
 		$("#search").animate({top: 0}, "fast");
 	});
 	$(".player .meta .list").live('click',function(){
-		if (aC.playbackQuality == "small") aC.playbackQuality = "hd720";
-		else aC.playbackQuality = "small";
+		if (aC.qualityChanged !== true) {
+			if (aC.settings.quality == "small") aC.settings.quality = "hd720";
+			else aC.settings.quality = "small";
+		}
 		$("body").toggleClass("engage");
 		$("#vD").toggleClass("hide");
 	});
