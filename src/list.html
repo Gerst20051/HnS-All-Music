@@ -19,7 +19,7 @@ background-color:#333332;
 
 body {
 color:#fff;
-font-family:HelveticaNeue,Helvetica,"lucida grande",tahoma,verdana,arial;
+font-family:helveticaneue,helvetica,"lucida grande",tahoma,verdana,arial;
 font-size:12px;
 margin:0;
 overflow-x:hidden;
@@ -109,7 +109,6 @@ letter-spacing:.019em;
 padding-top:4px;
 position:relative;
 text-shadow:#000 0 1px 1px;
-width:544px;
 z-index:1;
 }
 
@@ -147,6 +146,21 @@ $.fn.setData = function(obj){
 	});
 };
 
+Object.toType = (function toType(global){
+	return function(obj){
+		if (obj === global) return "global";
+		return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
+	}
+})(this);
+
+function sls(){
+	try {
+		return 'localStorage' in window && window['localStorage'] !== null;
+	} catch (e) {
+		return false;
+	}
+}
+
 var mainplaylist = [], playlistLength = 0, search = "", sresultLength = 0;
 
 function searchPlaylist(a,b){
@@ -168,11 +182,10 @@ function loadPlaylist(playlist){
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
 				var liclass="i",
-					html = $("<div/>"),
 					itemlist = $("<ul/>").attr('class','ti'),
 					item = '<li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>';
 				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass = liclass + " un";
-				list.push($("<li/>").attr('class',liclass).setData(v).html(html).append(itemlist.append(item))[0]);
+				list.push($("<li/>").attr('class',liclass).setData(v).append(itemlist.append(item))[0]);
 			}
 		});
 		$("#content").html(list);
@@ -185,13 +198,26 @@ function loadPlaylist(playlist){
 }
 
 function checkPlaylist(){
+	$(".ti").width($(window).width()-31);
 	$("#sB").keyup(doSearch);
+	if (sls()) {
+		var playlist = localStorage.getItem('playlist');
+		if (Object.toType(playlist) != "null") {
+			playlist = mainplaylist = $.parseJSON(playlist);
+			playlistLength = playlist.length;
+			if ($.isArray(playlist) && 0 < playlistLength) loadPlaylist(playlist);
+			else console.log("Error loading local playlist");
+		}
+	}
 	$.getJSON("playlist.json", function(a){
 		var data = a.data;
 		if ($.isArray(data) && 0 < data.length) {
-			mainplaylist = data;
-			playlistLength = data.length;
-			loadPlaylist(data);
+			if (sls()) localStorage['playlist'] = JSON.stringify(data);
+			if (!$.isArray(mainplaylist) || playlistLength == 0) {
+				mainplaylist = data;
+				playlistLength = data.length;
+				loadPlaylist(data);
+			}
 		} else console.log("Error loading playlist");
 	});
 }
