@@ -101,8 +101,10 @@ function action(){
 			console.log('Error! Bad Artist or Track Name');
 			APP.data[run].id = 0;
 			return init();
-		} else if (v.id == "") doInstantSearch($.trim(v.artist+ " " + v.track));
-		else init(true);
+		} else if (v.id == "") {
+			var search = $.trim(v.artist+ " " + v.track).replace('Remastered','').replace('Re-Recorded','').replace('Album Version','').replace('LP Version','').replace('Version','');
+			doInstantSearch($.trim(search));
+		} else init(true);
 	} else {
 		$("body").css({'margin':0,'overflow':'hidden'}).append('<textarea id="output"></textarea>').find("#output").height($(window).height()).width($(window).width()).val('{"data":'+JSON.stringify(APP.data)+'}').focus().select();
 	}
