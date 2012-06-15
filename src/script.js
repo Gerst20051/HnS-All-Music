@@ -12,7 +12,7 @@ playlist: [],
 playlistLength: 0,
 search: "",
 searchResults: [],
-searchLength: 0,
+searchLength: -1,
 searchFocus: false,
 starttimeFocus: false,
 playtimeFocus: false,
@@ -32,13 +32,14 @@ settings: {
 	repeat: false
 },
 searchPlaylist: function(a,b){
-	var retArr = [];
-	if (typeof a === 'string') a = eval(a);
+	var retArr = [], search = a.split(' ');
 	$.each(b, function(i,v){
 		if (typeof v['id'] !== "string" || typeof v['artist'] !== "string" || typeof v['track'] !== "string") return;
 		var artist = v['artist'].replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' ');
 		var track = v['track'].replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' ');
-		if (artist.match(a) || track.match(a)) retArr.push(i);
+		var song = artist + " " + track;
+		var rg = new RegExp('^(?=.*?'+search.join(")(?=.*?")+')',"i");
+		if (song.match(rg)) retArr.push(i);
 	});
 	aC.searchLength = retArr.length;
 	return retArr;
@@ -63,6 +64,7 @@ loadPlaylist: function(playlist){
 		$(".ti").width(aC.dimension-74);
 		$("#mainContainer").jScrollPane();
 		$(".jspPane").width($(".jspContainer").width());
+		if ($(".jspDrag").removeClass("long").height() < 25) $(".jspDrag").addClass("long");
 	} else {
 		if (0 < aC.playlist.length) {
 			$("#sresultcount").empty();
@@ -109,8 +111,10 @@ checkHash: function(){
 	if (found === false) {
 		if (0 < hash.length) clearHash();
 		$('#widgetContainer').animate({opacity:1});
-		var index = (aC.settings.random === false) ? 0 : getRandomInt(0,aC.playlistLength);
-		if (aC.playlist[index].id == 0) index = getRandomInt(0,aC.playlistLength);
+		var plength = aC.playlistLength;
+		if (0 < aC.searchLength) plength = aC.searchLength;
+		var index = (aC.settings.random === false) ? 0 : getRandomInt(0,plength);
+		if (aC.playlist[index].id == 0) index = getRandomInt(0,plength);
 		var item = aC.playlist[index];
 		$(".player .album-art-container").setData({index:index}).find(".art").attr('src',item.img);
 		$(".player .meta .titles").find(".track-name").text((index+1)+'. '+item.track).setData({index:index}).end().find(".artist-name").text(item.artist);
@@ -199,9 +203,17 @@ handleTrack: function(){
 },
 triggerPlayPause: function(i){
 	if (arguments.length == 0) i = aC.index;
-	if (aC.searchLength > 0) var a = aC.searchResults[i]; else var a = i;
-	if (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
-	var player = $(".player"), item = aC.playlist[a], pid = item.id;
+	var a = i, plength = aC.playlistLength;
+	if (0 < aC.searchLength) {
+		a = aC.searchResults[i];
+		plength = aC.searchLength;
+	}
+	try {
+		if (aC.playlist[a].id == 0) a = (aC.settings.random === false) ? (a+1) : getRandomInt(0,plength);
+		var player = $(".player"), item = aC.playlist[a], pid = item.id;
+	} catch(e) {
+		return false;
+	}
 	if (a == aC.index && arguments.length == 1) {
 		if (player.hasClass("on")) {
 			player.removeClass("on").addClass("off");
@@ -260,8 +272,10 @@ goPrevVideo: function(){
 },
 goNextVideo: function(){
 	if (aC.settings.repeat === false || arguments.length == 1) {
-		var index = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,aC.playlistLength);
-		if (index == aC.index) index = getRandomInt(0,aC.playlistLength);
+		var plength = aC.playlistLength;
+		if (0 < aC.searchLength) plength = aC.searchLength;
+		var index = (aC.settings.random === false) ? (aC.index+1) : getRandomInt(0,plength);
+		if (index == aC.index) index = getRandomInt(0,plength);
 		aC.triggerPlayPause(index, true);
 	} else aC.triggerPlayPause(aC.index, true);
 },
@@ -363,11 +377,11 @@ doPlaytimeKeys: function(e){
 },
 doSearch: function(){
 	var val = $.trim($("#sB").val().replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' '));
-	if (1 < val.length && val != search) {
+	if (2 < val.length && val != search) {
 		aC.search = val;
 		var rlength = aC.searchLength;
-		aC.searchResults = aC.searchPlaylist("/" + aC.search + "/i", aC.playlist);
-		if (aC.searchLength > 0) $("#sresultcount").text(aC.searchLength);
+		aC.searchResults = aC.searchPlaylist(val, aC.playlist);
+		if (0 < aC.searchLength) $("#sresultcount").text(aC.searchLength);
 		if (rlength != aC.searchLength) {
 			aC.loadPlaylist($.grep(aC.playlist, function(v,i){
 				return $.inArray(i,aC.searchResults) > -1;
@@ -375,7 +389,7 @@ doSearch: function(){
 		}			
 	} else if (0 == val.length) {
 		aC.search = "";
-		aC.searchLength = 0;
+		aC.searchLength = -1;
 		$("#sresultcount").empty();
 		aC.loadPlaylist(aC.playlist);
 	}
