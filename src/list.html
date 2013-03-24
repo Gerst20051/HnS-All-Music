@@ -137,6 +137,53 @@ white-space:nowrap;
 </style>
 <script src="http://code.jquery.com/jquery.min.js"></script>
 <script>
+window.Hash = {
+	query: {},
+	getHash: function(){return decodeURIComponent(window.location.hash.substring(1))},
+	clearHash: function(){window.location.replace("#")},
+	setHash: function(hash){window.location.replace("#"+encodeURI(hash))},
+	get: function(key){
+		if (this.has(key)) {
+			return this.query[key];
+		}
+	},
+	clear: function(){
+		this.query = {};
+		this.update();
+	},
+	set: function(key, value){
+		if (value != null) {
+			this.query[key] = value;
+			this.update();
+			return value;
+		}
+	},
+	has: function(key) {
+		return this.query[key] != null;
+	},
+	parse: function(){
+		var that = this;
+		this.getHash().replace(
+		    new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+		    function($0, $1, $2, $3) { that.query[$1] = $3; }
+		);
+		return this.query;
+	},
+	update: function(){
+		this.setHash("?"+$.param(this.query));
+	}
+};
+
+function handleHash(){
+	if (Hash.getHash().length) {
+		Hash.parse();
+		if (Hash.has("q")) {
+			$("#sB").val(Hash.get("q"));
+			doSearch();
+		}
+	}
+}
+
 $.fn.setData = function(obj){
 	if (typeof obj != "object") return this;
 	return this.each(function(){
@@ -181,7 +228,7 @@ function loadPlaylist(playlist){
 		var list = [];
 		$.each(playlist, function(i,v){
 			if (typeof v == "object") {
-				var liclass="i",
+				var liclass = "i",
 					itemlist = $("<ul/>").attr('class','ti'),
 					item = '<li class="tt">'+(i+1)+'. '+v.track+'</li><li class="a">'+v.artist+'</li>';
 				if (v.duration == 0 || v.id == "" || v.id == 0 || v.img == "") liclass = liclass + " un";
@@ -220,11 +267,13 @@ function checkPlaylist(){
 			}
 		} else console.log("Error loading playlist");
 	});
+	handleHash();
 }
 
 function doSearch(){
 	var val = $.trim($("#sB").val().replace(/[^a-zA-Z 0-9]+/g,'').replace('   ',' ').replace('  ',' '));
-	if (1 < val.length && val != search) {
+	Hash.set('q',val);
+	if (2 < val.length && val != search) {
 		search = val;
 		var rlength = sresultLength;
 		var results = searchPlaylist("/" + search + "/i", mainplaylist);
