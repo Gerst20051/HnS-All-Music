@@ -405,20 +405,20 @@ $(window).resize(function(){
 $(document).ready(function(){
 	aC.setDimensions();
 	aC.loadSettings();
-	$("#sB").live('focus',function(){
+	$("#sB").on('focus',function(){
 		aC.searchFocus = true;
 		if ($(this).val() == "Search Music") $(this).val('');
-	}).live('blur',function(){
+	}).on('blur',function(){
 		aC.searchFocus = false;
 		if ($.trim($(this).val()) == "") $(this).val('Search Music');
 	}).keyup(aC.doSearch);
-	$("#notifBar .closeButton").live('click',function(){
+	$("#notifBar .closeButton").on('click',function(){
 		aC.hideNotification();
 	});
-	$("#search .closeButton").live('click',function(){
+	$("#search .closeButton").on('click',function(){
 		$("#search").animate({top: -80}, "fast");
 	});
-	$("#config .closeButton").live('click',function(){
+	$("#config .closeButton").on('click',function(){
 		$("#config").animate({top: -80}, "fast");
 	});
 	$("#config ul").on('click','.setting',function(){
@@ -438,7 +438,7 @@ $(document).ready(function(){
 			}
 		}
 	});
-	$("#config #quality").live('click',function(){
+	$("#config #quality").on('click',function(){
 		aC.qualityChanged = true;
 		if (aC.settings["quality"] == "small") {
 			aC.settings["quality"] = "medium";
@@ -458,7 +458,7 @@ $(document).ready(function(){
 		}
 		if (sls()) localStorage['settings'] = JSON.stringify(aC.settings);
 	});
-	$("#config #sort").live('click',function(){
+	$("#config #sort").on('click',function(){
 		if (aC.settings["sort"] == "artist") {
 			aC.settings["sort"] = "track";
 			$("#sort .on").text('Track');
@@ -471,20 +471,20 @@ $(document).ready(function(){
 		}
 		if (sls()) localStorage['settings'] = JSON.stringify(aC.settings);
 	});
-	$("#starttime").live('click',function(){
+	$("#starttime").on('click',function(){
 		$("#starttime .on").focus();
 	});
-	$("#starttime .on").live('focus',function(){
+	$("#starttime .on").on('focus',function(){
 		aC.starttimeFocus = true;
-	}).live('blur',function(){
+	}).on('blur',function(){
 		aC.starttimeFocus = false;
 	}).keyup(aC.doStarttimeKeys);
-	$("#playtime").live('click',function(){
+	$("#playtime").on('click',function(){
 		$("#playtime .on").focus();
 	});
-	$("#playtime .on").live('focus',function(){
+	$("#playtime .on").on('focus',function(){
 		aC.playtimeFocus = true;
-	}).live('blur',function(){
+	}).on('blur',function(){
 		aC.playtimeFocus = false;
 	}).keyup(aC.doPlaytimeKeys);
 	$("#widgetContainer").hover(function(){
@@ -496,18 +496,18 @@ $(document).ready(function(){
 			width: $(".player").width()-$('.player').outerHeight()-8-8-19
 		}, 100)
 	});
-	$(".player .config").live('click',function(){
+	$(".player .config").on('click',function(){
 		$("#config").animate({top: 0}, "fast");
 	});
-	$(".player .meta .track-name").live('click',function(){
+	$(".player .meta .track-name").on('click',function(){
 		var coffset = Math.abs($("#content").offset().top);
 		var offset = $("#content").find(".i").eq(aC.index).offset().top;
 		$('.jspScrollable').data('jsp').scrollByY(offset-coffset);
 	});
-	$(".player .meta .embed").live('click',function(){
+	$(".player .meta .embed").on('click',function(){
 		$("#search").animate({top: 0}, "fast");
 	});
-	$(".player .meta .list").live('click',function(){
+	$(".player .meta .list").on('click',function(){
 		if (aC.qualityChanged !== true) {
 			if (aC.settings.quality == "small") aC.settings.quality = "hd720";
 			else aC.settings.quality = "small";
@@ -515,19 +515,19 @@ $(document).ready(function(){
 		$("body").toggleClass("engage");
 		$("#vD").toggleClass("hide");
 	});
-	$(".player .album-art-container").live('click',function(){
+	$(".player .album-art-container").on('click',function(){
 		aC.triggerPlayPause($(this).data('index'));
 	});
 	$("#content").on('click','.i',function(){
 		aC.triggerPlayPause($(this).index());
 	});
-	$(".player .skip-back").live('click',function(){
+	$(".player .skip-back").on('click',function(){
 		aC.goPrevVideo(true);
 	});
-	$(".player .skip-fwd").live('click',function(){
+	$(".player .skip-fwd").on('click',function(){
 		aC.goNextVideo(true);
 	});
-	$(".player .buffer").live('click',function(e){
+	$(".player .buffer").on('click',function(e){
 		var x = e.pageX-$(this).offset().left;
 		aC.handleTrack(x);
 	});
