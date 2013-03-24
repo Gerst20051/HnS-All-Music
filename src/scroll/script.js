@@ -62,9 +62,9 @@ loadPlaylist: function(playlist){
 		});
 		$("#content").html(list);
 		$(".ti").width(aC.dimension-74);
-		// $("#mainContainer").jScrollPane();
-		// $(".jspPane").width($(".jspContainer").width());
-		// if ($(".jspDrag").removeClass("long").height() < 25) $(".jspDrag").addClass("long");
+		$("#mainContainer").jScrollPane();
+		$(".jspPane").width($(".jspContainer").width());
+		if ($(".jspDrag").removeClass("long").height() < 25) $(".jspDrag").addClass("long");
 	} else {
 		if (0 < aC.playlist.length) {
 			$("#sresultcount").empty();
@@ -135,25 +135,6 @@ niceDuration: function(a){
 setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
 	var dimension = aC.dimension = height-$(".player").outerHeight()-1;
-	$("#mainContainer").add(".player").add(".overlay").width(dimension);
-	$("#widgetContainer").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
-	$(".player .meta .progress-bar-container").width(dimension-123);
-	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension-187);
-	else $(".player .meta .controls .buffer").width(dimension-171);
-	$(".ti").width(dimension-74);
-	if (arguments.length == 1) {
-		setTimeout(function(){
-			aC.setPlayerDimensions();
-		},1000);
-	}
-	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) {
-		aC.showNotification("This website works best while using Google Chrome. Wise up!");
-		alert("Please Use Google Chrome. Wise Up!");
-	}
-},
-oldSetDimensions: function(){
-	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
-	var dimension = aC.dimension = height-$(".player").outerHeight()-1;
 	$("#mainContainer").height(dimension).add(".player").add(".overlay").width(dimension);
 	$("#widgetContainer").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
 	$(".player .meta .progress-bar-container").width(dimension-123);
@@ -163,6 +144,8 @@ oldSetDimensions: function(){
 	if (arguments.length == 1) {
 		setTimeout(function(){
 			aC.setPlayerDimensions();
+			$(".jspScrollable").data('jsp').reinitialise();
+			$(".jspPane").width($(".jspContainer").width());
 		},1000);
 	}
 	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) {
@@ -335,7 +318,6 @@ onKeyDown: function(e){
 					//if (playlist[index].
 				}
 			} else if (/\d/.test(key)) {
-				/*
 				var jsp = $('.jspScrollable').data('jsp'), offset = $("#content").find(".i").filter(":last").offset().top-$(".player").outerHeight();
 				if (key == 1) jsp.scrollToY(0);
 				else if (key == 0) jsp.scrollToY(offset);
@@ -343,7 +325,6 @@ onKeyDown: function(e){
 					var increment = offset/9;
 					jsp.scrollToY(increment*key);
 				}
-				*/
 			}
 		break;
 	}
@@ -521,7 +502,7 @@ $(document).ready(function(){
 	$(".player .meta .track-name").on('click',function(){
 		var coffset = Math.abs($("#content").offset().top);
 		var offset = $("#content").find(".i").eq(aC.index).offset().top;
-		//$('.jspScrollable').data('jsp').scrollByY(offset-coffset);
+		$('.jspScrollable').data('jsp').scrollByY(offset-coffset);
 	});
 	$(".player .meta .embed").on('click',function(){
 		$("#search").animate({top: 0}, "fast");

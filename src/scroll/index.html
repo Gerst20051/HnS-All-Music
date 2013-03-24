@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<title>HnS Music Discovery</title>
+<meta name="description" content="HnS Music Discovery is a playlist based music listening and video watching discovery engine.">
+<link href="favicon.ico" rel="icon" type="image/x-icon"/>
+<link type="text/css" rel="stylesheet" href="base.css"/>
+<link type="text/css" rel="stylesheet" href="style.css"/>
+<script src="http://code.jquery.com/jquery.min.js"></script>
+<script src="plugins.js"></script>
+<script src="script.js"></script>
+</head>
+<body class="p">
+<div id="outerWidgetContainer">
+<div id="widgetContainer">
+<div id="notifBar" class="overlay">
+<p id="message"></p>
+<div class="closeButton"></div>
+</div>
+<div id="search" class="overlay">
+<div class="content">
+<span id="sresultcount"></span>
+<input id="sB" type="text" value="Search Music" spellcheck="false"></input>
+</div>
+<div class="closeButton"></div>
+</div>
+<div id="config" class="overlay">
+<div class="content">
+<ul id="settings1">
+<li id="random" class="setting"><div>Random:</div><div class="on">On</div></li>
+<li id="express" class="setting"><div>Express:</div><div class="on">On</div></li>
+<li id="autostart" class="setting"><div>Autostart:</div><div class="on">On</div></li>
+</ul>
+<ul id="settings2">
+<li id="quality"><div>Quality:</div><div class="on">Small</div></li>
+<li id="starttime"><div>Starttime (sec):</div><div class="on" contenteditable="true">30</div></li>
+<li id="playtime"><div>Playtime (sec):</div><div class="on" contenteditable="true">160</div></li>
+</ul>
+<ul id="settings3">
+<li id="sort"><div>Sort:</div><div class="on">Artist</div></li>
+<li id="repeat" class="setting"><div>Repeat:</div><div class="off">Off</div></li>
+</ul>
+</div>
+<div class="closeButton"></div>
+</div>
+<div class="player off">
+<div class="album-art-container">
+<div class="album-art">
+<img class="art" src="i/defaultCover.png">
+<div class="play-pause-btn"></div>
+</div>
+</div>
+<div class="divider"></div>
+<div class="config"></div>
+<div class="meta">
+<div class="titles">
+<div class="track-name ellipsis"></div>
+<div class="artist-name ellipsis"></div>
+</div>
+<div class="right-bar-buttons">
+<div class="action-buttons-container">
+<div class="embed"></div>
+<div class="list"></div>
+</div>
+</div>
+<div class="progress-bar-container">
+<div class="controls">
+<div class="skip-back"></div>
+<div class="buffer">
+<div class="seeker"></div>
+</div>
+<div class="skip-fwd"></div>
+<div class="time-spent">0:00</div>
+</div>
+<div class="context-title">
+<div class="type-icon"></div>
+<div class="title-content ellipsis">All Music</div>
+</div>
+</div>
+</div>
+</div>
+<div id="mainContainer">
+<ul id="content" class="content"></ul>
+</div>
+</div></div>
+<div id="vD" style="visibility:hidden"><div id="iVD">Loading...</div></div>
+</div>
+</div>
+</div>
+</body>
+</html>
