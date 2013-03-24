@@ -55,11 +55,12 @@ color:#fff;
 font-family:helvetica,"lucida grande",tahoma,verdana,arial;
 font-size:11px;
 height:80px;
+left:0;
 overflow:hidden;
-position:absolute;
+position:fixed;
 text-align:center;
 top:-80px;
-width:100%;
+width:618px;
 z-index:20;
 }
 
@@ -209,7 +210,9 @@ border-top-left-radius:3px;
 -webkit-border-top-right-radius:3px;
 border-top-right-radius:3px;
 height:78px;
-position:relative;
+left:0;
+position:fixed;
+top:0;
 width:618px;
 }
 
@@ -655,9 +658,10 @@ border-bottom-left-radius:3px;
 -moz-border-radius-bottomright:3px;
 -webkit-border-bottom-right-radius:3px;
 border-bottom-right-radius:3px;
+margin-top:80px;
 outline:0;
 padding:0;
-width:100%;
+width:618px;
 }
 
 #mainContainer .content {

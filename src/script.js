@@ -136,7 +136,7 @@ setDimensions: function(){
 	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
 	var dimension = aC.dimension = height-$(".player").outerHeight()-1;
 	$("#mainContainer").add(".player").add(".overlay").width(dimension);
-	$("#widgetContainer").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
+	$("#widgetContainer,.player,.overlay").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
 	$(".player .meta .progress-bar-container").width(dimension-123);
 	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension-187);
 	else $(".player .meta .controls .buffer").width(dimension-171);
