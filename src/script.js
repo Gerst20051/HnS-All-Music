@@ -528,9 +528,6 @@ $(document).ready(function(){
 	});
 	$(".player .buffer").on('click',function(e){
 		var x = e.pageX-$(this).offset().left;
-		console.log(e.pageX);
-		console.log($(this).offset().left);
-		console.log(x);
 		aC.handleTrack(x);
 	});
 	(function(){
