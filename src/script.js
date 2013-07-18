@@ -138,36 +138,13 @@ setDimensions: function(){
 	$("#mainContainer").add(".player").add(".overlay").width(dimension);
 	$("#widgetContainer,.player,.overlay").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
 	$(".player .meta .progress-bar-container").width(dimension-123);
-	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension-187);
-	else $(".player .meta .controls .buffer").width(dimension-171);
+	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension-190);
+	else $(".player .meta .controls .buffer").width(dimension-174);
 	$(".ti").width(dimension-74);
 	if (arguments.length == 1) {
 		setTimeout(function(){
 			aC.setPlayerDimensions();
 		},1000);
-	}
-	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) {
-		aC.showNotification("This website works best while using Google Chrome. Wise up!");
-		alert("Please Use Google Chrome. Wise Up!");
-	}
-},
-oldSetDimensions: function(){
-	var w = $(window), height = w.height(), width = w.width(), rchrome = /chrome/;
-	var dimension = aC.dimension = height-$(".player").outerHeight()-1;
-	$("#mainContainer").height(dimension).add(".player").add(".overlay").width(dimension);
-	$("#widgetContainer").css("left",(w.width()-$("#widgetContainer").outerWidth())/2);
-	$(".player .meta .progress-bar-container").width(dimension-123);
-	if (0 < aC.index && aC.index < aC.playlistLength-1) $(".player .meta .controls .buffer").width(dimension-187);
-	else $(".player .meta .controls .buffer").width(dimension-171);
-	$(".ti").width(dimension-74);
-	if (arguments.length == 1) {
-		setTimeout(function(){
-			aC.setPlayerDimensions();
-		},1000);
-	}
-	if (!(rchrome.test(navigator.userAgent.toLowerCase()))) {
-		aC.showNotification("This website works best while using Google Chrome. Wise up!");
-		alert("Please Use Google Chrome. Wise Up!");
 	}
 },
 setPlayerDimensions: function(){
@@ -176,7 +153,7 @@ setPlayerDimensions: function(){
 		aC.newPlayerWidth = width-100;
 		aC.newPlayerHeight = aC.newPlayerWidth*.5625;
 		$(ytplayer).height(aC.newPlayerHeight).width(aC.newPlayerWidth);
-		$("#vD").center();
+		$("#vD").center("fixed");
 	}
 },
 loadSettings: function(){
@@ -199,23 +176,26 @@ hideNotification: function(){
 	$("#notifBar").animate({top: -80}, "fast");
 	$("#notifBar #message").empty();
 },
-handleTrack: function(){
+handleTrack: function(newSeekerWidth){
 	if (aC.seekerInterval !== null) clearInterval(aC.seekerInterval), aC.seekerInterval = null;
 	if (aC.durationInterval !== null) clearInterval(aC.durationInterval), aC.durationInterval = null;
-	var player = $(".player.on"), seeker = player.find(".seeker"), s = player.find(".buffer").width();
-	var b = seeker.width(), p = yt.getCurrentTime(), q = Number(aC.playlist[aC.index].duration)*1E3, g = Math.floor(q/s);
-	if (aC.settings.express === true && p < aC.settings.starttime-1) p = aC.settings.starttime-1;
-	if (arguments.length == 1) {
-		var w = b = arguments[0], seek = w*g/1E3, p = g*w/1E3;
-		yt.seekTo(seek);
-	} else var w = b = Math.floor(s/q*p*1E3);
-	seeker.width(w);
+	var $player = $(".player.on"), $seeker = $player.find(".seeker"), bufferWidth = $player.find(".buffer").width();
+	var seekerWidth = $seeker.width(), ytCurrentTime = yt.getCurrentTime(), msDuration = Number(aC.playlist[aC.index].duration)*1E3, msPerSeekerPixel = Math.floor(msDuration/bufferWidth);
+	if (aC.settings.express === true && ytCurrentTime < aC.settings.starttime-1) ytCurrentTime = aC.settings.starttime-1;
+	if (0 < +newSeekerWidth) {
+		seekerWidth = newSeekerWidth;
+		ytCurrentTime = Math.floor(msPerSeekerPixel*seekerWidth/1E3);
+		yt.seekTo(ytCurrentTime);
+	} else {
+		seekerWidth = Math.floor(bufferWidth/msDuration*ytCurrentTime*1E3);
+	}
+	$seeker.width(seekerWidth);
 	aC.seekerInterval = setInterval(function(){
-		b < s && seeker.width(++b)
-	}, g);
-	player.find(".time-spent").text(aC.niceDuration(--p));
+		seekerWidth < bufferWidth && $seeker.width(++seekerWidth);
+	}, msPerSeekerPixel);
+	$player.find(".time-spent").text(aC.niceDuration(--ytCurrentTime));
 	aC.durationInterval = setInterval(function(){
-		player.find(".time-spent").text(aC.niceDuration(++p));
+		$player.find(".time-spent").text(aC.niceDuration(++ytCurrentTime));
 	}, 1E3);
 },
 triggerPlayPause: function(i){
@@ -257,15 +237,15 @@ triggerPlayPause: function(i){
 		$("#content").find(".i").removeClass("on").eq(i).addClass("on");
 		if (a > 0) {
 			if (a == aC.playlistLength-1) {
-				player.find(".buffer").css('margin-left',1).width(aC.dimension-171);
+				player.find(".buffer").css('margin-left',1).width(aC.dimension-174);
 				player.find(".skip-fwd").hide().end().find(".skip-back").show();
 			} else {
-				player.find(".buffer").css('margin-left',1).width(aC.dimension-187);
+				player.find(".buffer").css('margin-left',1).width(aC.dimension-190);
 				player.find(".skip-back").show().end().find(".skip-fwd").show();
 			}
 		} else {
 			player.find(".skip-back").hide().end().find(".skip-fwd").show();
-			player.find(".buffer").css('margin-left',4).width(aC.dimension-171);
+			player.find(".buffer").css('margin-left',4).width(aC.dimension-174);
 		}
 		
 		if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
@@ -548,6 +528,9 @@ $(document).ready(function(){
 	});
 	$(".player .buffer").on('click',function(e){
 		var x = e.pageX-$(this).offset().left;
+		console.log(e.pageX);
+		console.log($(this).offset().left);
+		console.log(x);
 		aC.handleTrack(x);
 	});
 	(function(){
@@ -561,7 +544,7 @@ function onYouTubePlayerReady(a){
 	ytplayer.addEventListener("onStateChange", "onPlayerStateChange");
 	ytplayer.addEventListener("onError", "onPlayerError");
 	aC.setPlayerDimensions();
-	$("#vD").center().addClass('hide').css('visibility','visible');
+	$("#vD").center("fixed").addClass('hide').css('visibility','visible');
 	aC.checkPlaylist();
 	aC.checkHash();
 }

@@ -13,10 +13,10 @@ $.fn.setData = function(obj){
 	});
 };
 
-$.fn.center = function(){
-	var w = $(window);
+$.fn.center = function(fixed){
+	var w = $(window), position = (!!fixed) ? "fixed" : "absolute";
 	return this.each(function(){
-		$(this).css("position","absolute");
+		$(this).css("position",position);
 		$(this).css("top",((w.height() - $(this).outerHeight()) / 2) + w.scrollTop() + "px");
 		$(this).css("left",((w.width() - $(this).outerWidth()) / 2) + w.scrollLeft() + "px");
 	});
@@ -49,33 +49,33 @@ Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.ind
 Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
 
 window.keys = {
-BACKSPACE: 8,
-DOWN_ARROW: 40,
-DOWN_ARROW2: 63233,
-END: 35,
-END2: 63275,
-ENTER: 13,
-ESCAPE: 27,
-HOME: 36,
-HOME2: 63273,
-LEFT_ARROW: 37,
-LEFT_ARROW2: 63234,
-NEXT: 176,
-NUMPAD_ENTER: 108,
-PAGE_DOWN: 34,
-PAGE_DOWN2: 63277,
-PAGE_UP: 33,
-PAGE_UP2: 63276,
-PAUSE: 19,
-PAUSE2: 63250,
-PLAY: 179,
-PREV: 177,
-RIGHT_ARROW: 39,
-RIGHT_ARROW2: 63235,
-SPACE: 32,
-TAB: 9,
-UP_ARROW: 38,
-UP_ARROW2: 63232
+	BACKSPACE: 8,
+	DOWN_ARROW: 40,
+	DOWN_ARROW2: 63233,
+	END: 35,
+	END2: 63275,
+	ENTER: 13,
+	ESCAPE: 27,
+	HOME: 36,
+	HOME2: 63273,
+	LEFT_ARROW: 37,
+	LEFT_ARROW2: 63234,
+	NEXT: 176,
+	NUMPAD_ENTER: 108,
+	PAGE_DOWN: 34,
+	PAGE_DOWN2: 63277,
+	PAGE_UP: 33,
+	PAGE_UP2: 63276,
+	PAUSE: 19,
+	PAUSE2: 63250,
+	PLAY: 179,
+	PREV: 177,
+	RIGHT_ARROW: 39,
+	RIGHT_ARROW2: 63235,
+	SPACE: 32,
+	TAB: 9,
+	UP_ARROW: 38,
+	UP_ARROW2: 63232
 };
 
 tfObjSort={
@@ -170,7 +170,7 @@ yt={
 	getDuration: function(){if (ytplayer) return ytplayer.getDuration()},
 	getCurrentTime: function(){if (ytplayer) return ytplayer.getCurrentTime()},
 	setSize: function(w,h){if (ytplayer) return ytplayer.setSize(w,h)},
-	seekTo: function(s){if (ytplayer) return ytplayer.seekTo(s,false)}
+	seekTo: function(s){if (ytplayer) return ytplayer.seekTo(s,true)}
 };
 
 (function(){window._gaq=[['_setAccount','UA-32560649-1'],['_setDomainName','hns.netai.net'],['_trackPageview']];var a=document.createElement('script');a.type='text/javascript';a.async=true;a.src=('https:'==document.location.protocol?'https://ssl':'http://www')+'.google-analytics.com/ga.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(a,s)})();
