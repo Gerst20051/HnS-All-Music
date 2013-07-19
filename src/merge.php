@@ -2,7 +2,7 @@
 header("Pragma: no-cache");
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = true;
+$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = false;
 
 /*********************************/
 /***** List of Manual Edits *******/
@@ -80,7 +80,9 @@ foreach ($oldjson as $oldkey=>$olditem) {
 $playlist['data'] = $newjson;
 $data = json_encode($playlist);
 if ($writetofile === true) {
-	file_write("newplaylist.json", $data);
+	$f = 'newplaylist.json';
+	file_write($f, $data);
+	echo "Success, wrote data to file ($f)";
 }
 } else {
 ?>
