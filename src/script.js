@@ -27,7 +27,7 @@ settings: {
 	autostart: true,
 	order: "artist",
 	starttime: 30,
-	playtime: 160,
+	playtime: 90,
 	quality: "small",
 	repeat: false
 },
@@ -62,9 +62,6 @@ loadPlaylist: function(playlist){
 		});
 		$("#content").html(list);
 		$(".ti").width(aC.dimension-74);
-		// $("#mainContainer").jScrollPane();
-		// $(".jspPane").width($(".jspContainer").width());
-		// if ($(".jspDrag").removeClass("long").height() < 25) $(".jspDrag").addClass("long");
 	} else {
 		if (0 < aC.playlist.length) {
 			$("#sresultcount").empty();
@@ -164,6 +161,8 @@ loadSettings: function(){
 			for (id in aC.settings) {
 				if (aC.settings[id] === false) $("#"+id+" .on").attr('class','off').text('Off');
 				else if (aC.settings[id] === true) $("#"+id+" .off").attr('class','on').text('On');
+				else if (Object.toType(aC.settings[id]) === "string") $("#"+id+" .on").text(aC.settings[id].capitalize());
+				else if (Object.toType(aC.settings[id]) === "number") $("#"+id+" .on").text(aC.settings[id]);
 			}
 		}
 	}
@@ -501,7 +500,6 @@ $(document).ready(function(){
 	$(".player .meta .track-name").on('click',function(){
 		var coffset = Math.abs($("#content").offset().top);
 		var offset = $("#content").find(".i").eq(aC.index).offset().top;
-		//$('.jspScrollable').data('jsp').scrollByY(offset-coffset);
 	});
 	$(".player .meta .embed").on('click',function(){
 		$("#search").animate({top: 0}, "fast");

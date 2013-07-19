@@ -16,9 +16,9 @@ $.fn.setData = function(obj){
 $.fn.center = function(fixed){
 	var w = $(window), position = (!!fixed) ? "fixed" : "absolute";
 	return this.each(function(){
-		$(this).css("position",position);
-		$(this).css("top",((w.height() - $(this).outerHeight()) / 2) + w.scrollTop() + "px");
-		$(this).css("left",((w.width() - $(this).outerWidth()) / 2) + w.scrollLeft() + "px");
+		$(this).css("position", position);
+		$(this).css("top", ((w.height() - $(this).outerHeight()) / 2) + w.scrollTop() + "px");
+		$(this).css("left", ((w.width() - $(this).outerWidth()) / 2) + w.scrollLeft() + "px");
 	});
 };
 
@@ -47,6 +47,7 @@ function setHash(hash){ window.location.replace("#" + encodeURI(hash)); }
 
 Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
 Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
+String.prototype.capitalize = function(){ return this[0].toUpperCase() + this.slice(1); };
 
 window.keys = {
 	BACKSPACE: 8,
