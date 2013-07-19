@@ -38,9 +38,9 @@ $playlist = array('data'=>array());
 for ($k = 0; $k <= $l; $k++) {
 	if ($clean) $s = clean($f[$k]);
 	else $s = $f[$k];
-	$s = explode(' - ',$s); // – <-- symbol used to separate artist from track name is different.
+	$s = explode(' | ',$s); // – <-- symbol used to separate artist from track name is different (replaced in clean function).
 	$artist = array_shift($s);
-	$track = trim(implode(' – ',$s));
+	$track = trim(implode(' | ',$s));
 	$item = array('id'=>'','artist'=>$artist,'track'=>$track,'img'=>'','duration'=>0);
 	array_push($playlist['data'],$item);
 }
@@ -60,7 +60,7 @@ $playlist['data'] = $newjson;
 
 $data = json_encode($playlist);
 if ($writetofile === true) {
-	$f="newplaylist.json";
+	$f = "newplaylist.json";
 	if (is_writable($f)) {
 		if (!$handle = fopen($f, 'w')) {
 			 echo "Cannot open file ($f)";

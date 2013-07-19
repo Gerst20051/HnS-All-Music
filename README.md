@@ -19,10 +19,11 @@ HnS Music Discovery is a playlist based music listening and video watching disco
 
 1. **Copy** songs from spotify playlist into _blank Excel Spreadsheet_
 2. **Copy** the output into the blank textfile named **playlist.txt**
-3. Run **merge.php** script with **$newplaylist = true;**
--- When the script is finished running it will say "Success, wrote data to file (**newplaylist.json**)"
+3. **Replace** all of the dashes between the artist and name with a | (pipe).
+4. Run **merge.php** script with **$newplaylist = true;**
+-- When the script is finished running it will say \"Success, wrote data to file ( **newplaylist.json** )\"
 -- It doesn't overwrite the original playlist.json incase something goes wrong during the process or you want to change some settings.
-4. Run **merge.php** again with **$newplaylist = false;**
+5. Run **merge.php** again with **$newplaylist = false;**
 -- This time it will load the data in the file **newplaylist.json** into a variable for JavaScript to populate the empty data from YouTube.
 -- This script will look through the data and determine whether or not the song his alrady been populated by looking at the ID.
 --- If it is set to 0 that means an error has occured with the processing or it couldn't find a video for that song.
@@ -30,7 +31,7 @@ HnS Music Discovery is a playlist based music listening and video watching disco
 --- The script will even query google to get search suggestions based on the artist and track. It will use the first suggestion to search youtube. If it doesn't return a suggestion it will assume the song doesn't exist and skip to the next song without querying youtube.
 --- The vidoes that aren't found on youtube are logged in the console so that they can be manually populated and they won't be queried more than once.
 -- When the script has reached the end of the playlist it will output the finalized json data into a **textarea**.
-5. **Copy** the outputed json data into **playlist.json** and the application is now ready to load the new data.
+6. **Copy** the outputed json data into **playlist.json** and the application is now ready to load the new data.
 
 > The script in _string.php_ was used to initially populate playlist.json but once I had a playlist I needed to create another script to merge the updates so that I wouldn't have to repopulate the youtube data for every single song.
 
