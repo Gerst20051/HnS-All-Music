@@ -19,6 +19,27 @@ $f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true;
 /*** {"id":"TEiBDI220HY","artist":"The Bellamy Brothers","track":"If I Said You Had A Beautiful Body (Would You Hold It Against Me)","img":"http://i.ytimg.com/vi/TEiBDI220HY/default.jpg","duration":338}
 /*********************************/
 
+function file_write($filename, &$content) {
+	if (!is_writable($filename)) {
+		if (!chmod($filename, 0666)) {
+			 echo "Cannot change the mode of file ($filename)";
+			 exit;
+		};
+	}
+	if (!$fp = @fopen($filename, 'w')) {
+		echo "Cannot open file ($filename)";
+		exit;
+	}
+	if (fwrite($fp, $content) === false) {
+		echo "Cannot write to file ($filename)";
+		exit;
+	} 
+	if (!fclose($fp)) {
+		echo "Cannot close file ($filename)";
+		exit;
+	}
+}
+
 if ($newplaylist === true) {
 function clean($s){
 	$s = preg_replace('/\s[\s]+/', ' ', $s);
@@ -57,22 +78,9 @@ foreach ($oldjson as $oldkey=>$olditem) {
 	}
 }
 $playlist['data'] = $newjson;
-
 $data = json_encode($playlist);
 if ($writetofile === true) {
-	$f = "newplaylist.json";
-	if (is_writable($f)) {
-		if (!$handle = fopen($f, 'w')) {
-			 echo "Cannot open file ($f)";
-			 exit;
-		}
-		if (fwrite($handle, $data) === false) {
-			echo "Cannot write to file ($f)";
-			exit;
-		}
-		echo "Success, wrote data to file ($f)";
-		fclose($handle);
-	} else echo "The file $f is not writable";
+	file_write("newplaylist.json", $data);
 }
 } else {
 ?>
