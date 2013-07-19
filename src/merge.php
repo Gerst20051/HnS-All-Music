@@ -2,7 +2,7 @@
 header("Pragma: no-cache");
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = false;
+$f = file('playlist.txt'); $l = count($f)-1; $writetofile = true; $clean = true; $newplaylist = true;
 
 /*********************************/
 /***** List of Manual Edits *******/
@@ -38,9 +38,9 @@ $playlist = array('data'=>array());
 for ($k = 0; $k <= $l; $k++) {
 	if ($clean) $s = clean($f[$k]);
 	else $s = $f[$k];
-	$s = explode(' - ',$s);
+	$s = explode(' - ',$s); // – <-- symbol used to separate artist from track name is different.
 	$artist = array_shift($s);
-	$track = trim(implode(' - ',$s));
+	$track = trim(implode(' – ',$s));
 	$item = array('id'=>'','artist'=>$artist,'track'=>$track,'img'=>'','duration'=>0);
 	array_push($playlist['data'],$item);
 }
@@ -48,8 +48,8 @@ for ($k = 0; $k <= $l; $k++) {
 $oldjson =  json_decode(file_get_contents('playlist.json'),true);
 $oldjson = $oldjson['data'];
 $newjson = $playlist['data'];
-foreach($oldjson as $oldkey=>$olditem) {
-	foreach($newjson as $newkey=>$newitem) {
+foreach ($oldjson as $oldkey=>$olditem) {
+	foreach ($newjson as $newkey=>$newitem) {
 		if ($olditem['artist'] == $newitem['artist'] && $olditem['track'] == $newitem['track']) {
 			$newjson[$newkey] = $oldjson[$oldkey];
 			break;
@@ -102,7 +102,7 @@ function action(){
 			APP.data[run].id = 0;
 			return init();
 		} else if (v.id == "") {
-			var search = $.trim(v.artist+ " " + v.track).replace('Remastered','').replace('Re-Recorded','').replace('Album Version','').replace('LP Version','').replace('Version','');
+			var search = $.trim(v.artist + " " + v.track).replace('Remastered','').replace('Re-Recorded','').replace('Album Version','').replace('LP Version','').replace('Version','');
 			doInstantSearch($.trim(search));
 		} else init(true);
 	} else {
