@@ -1,9 +1,3 @@
-/*
- *
- * Copyright (c) 2008-2010, Felix Bruns <felixbruns@web.de>
- *
- */
-
 function LastFM(options){
 	/* Set default values for required options. */
 	var apiKey    = options.apiKey    || '';
@@ -49,7 +43,7 @@ function LastFM(options){
 				//html.removeChild(iframe);
 
 				/* Call user callback. */
-				if(typeof(callbacks.success) != 'undefined'){
+				if (typeof(callbacks.success) != 'undefined'){
 					callbacks.success();
 				}
 			};
@@ -58,13 +52,11 @@ function LastFM(options){
 			html.appendChild(iframe);
 
 			/* Get iframe document. */
-			if(typeof(iframe.contentWindow) != 'undefined'){
+			if (typeof(iframe.contentWindow) != 'undefined'){
 				doc = iframe.contentWindow.document;
-			}
-			else if(typeof(iframe.contentDocument.document) != 'undefined'){
+			} else if (typeof(iframe.contentDocument.document) != 'undefined'){
 				doc = iframe.contentDocument.document.document;
-			}
-			else{
+			} else {
 				doc = iframe.contentDocument.document;
 			}
 
@@ -86,9 +78,7 @@ function LastFM(options){
 
 			/* Close iframe document. */
 			doc.close();
-		}
-		/* Cross-domain GET request (JSONP). */
-		else{
+		} else { /* Cross-domain GET request (JSONP). */
 			/* Get JSONP callback name. */
 			var jsonp = 'jsonp' + new Date().getTime();
 
@@ -96,11 +86,10 @@ function LastFM(options){
 			var hash = auth.getApiSignature(params);
 
 			/* Check cache. */
-			if(typeof(cache) != 'undefined' && cache.contains(hash) && !cache.isExpired(hash)){
-				if(typeof(callbacks.success) != 'undefined'){
+			if (typeof cache != 'undefined' && cache.contains(hash) && !cache.isExpired(hash)) {
+				if (typeof callbacks.success != 'undefined') {
 					callbacks.success(cache.load(hash));
 				}
-
 				return;
 			}
 
@@ -110,37 +99,30 @@ function LastFM(options){
 
 			/* Create JSONP callback function. */
 			window[jsonp] = function(data){
-				/* Is a cache available?. */
-				if(typeof(cache) != 'undefined'){
+				if (typeof cache != 'undefined') {
 					var expiration = cache.getExpirationTime(params);
-
-					if(expiration > 0){
+					if (0 < expiration) {
 						cache.store(hash, data, expiration);
 					}
 				}
 
 				/* Call user callback. */
-				if(typeof(data.error) != 'undefined'){
-					if(typeof(callbacks.error) != 'undefined'){
+				if (typeof data.error != 'undefined') {
+					if (typeof callbacks.error != 'undefined') {
 						callbacks.error(data.error, data.message);
 					}
-				}
-				else if(typeof(callbacks.success) != 'undefined'){
+				} else if (typeof callbacks.success != 'undefined') {
 					callbacks.success(data);
 				}
 
 				/* Garbage collect. */
 				window[jsonp] = undefined;
 
-				try{
+				try {
 					delete window[jsonp];
-				}
-				catch(e){
-					/* Nothing. */
-				}
+				} catch(e) {}
 
-				/* Remove script element. */
-				if(head){
+				if (head) {
 					head.removeChild(script);
 				}
 			};
@@ -152,7 +134,7 @@ function LastFM(options){
 			/* Build parameter string. */
 			var array = [];
 
-			for(var param in params){
+			for (var param in params) {
 				array.push(encodeURIComponent(param) + "=" + encodeURIComponent(params[param]));
 			}
 
@@ -206,7 +188,7 @@ function LastFM(options){
 	this.album = {
 		addTags : function(params, session, callbacks){
 			/* Build comma separated tags string. */
-			if(typeof(params.tags) == 'object'){
+			if (typeof params.tags == 'object') {
 				params.tags = params.tags.join(',');
 			}
 
@@ -235,7 +217,7 @@ function LastFM(options){
 
 		share : function(params, session, callbacks){
 			/* Build comma separated recipients string. */
-			if(typeof(params.recipient) == 'object'){
+			if (typeof params.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
 
@@ -247,7 +229,7 @@ function LastFM(options){
 	this.artist = {
 		addTags : function(params, session, callbacks){
 			/* Build comma separated tags string. */
-			if(typeof(params.tags) == 'object'){
+			if (typeof params.tags == 'object') {
 				params.tags = params.tags.join(',');
 			}
 
@@ -316,7 +298,7 @@ function LastFM(options){
 
 		share : function(params, session, callbacks){
 			/* Build comma separated recipients string. */
-			if(typeof(params.recipient) == 'object'){
+			if (typeofparams.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
 
@@ -350,14 +332,9 @@ function LastFM(options){
 
 		/* Deprecated. Security hole was fixed. */
 		getWebSession : function(callbacks){
-			/* Save API URL and set new one (needs to be done due to a cookie!). */
 			var previuousApiUrl = apiUrl;
-
 			apiUrl = 'http://ext.last.fm/2.0/';
-
 			signedCall('auth.getWebSession', null, null, callbacks);
-
-			/* Restore API URL. */
 			apiUrl = previuousApiUrl;
 		}
 	};
@@ -409,7 +386,7 @@ function LastFM(options){
 
 		share : function(params, session, callbacks){
 			/* Build comma separated recipients string. */
-			if(typeof(params.recipient) == 'object'){
+			if (typeof params.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
 
@@ -656,17 +633,14 @@ function LastFM(options){
 			signedCall('track.removeTag', params, session, callbacks, 'POST');
 		},
 
-		scrobble : function(params, callbacks){
-			/* Flatten an array of multiple tracks into an object with "array notation". */
-			if(params.constructor.toString().indexOf("Array") != -1){
+		scrobble : function(params, session, callbacks){
+			if (params.constructor.toString().indexOf("Array") != -1) {
 				var p = {};
-
-				for(i in params){
-					for(j in params[i]){
-						p[j + '[' + i + ']'] = params[i][j];
+				for (i in params) {
+					for (j in params[i]) {
+						p[j+'['+i+']'] = params[i][j];
 					}
 				}
-
 				params = p;
 			}
 
@@ -679,7 +653,7 @@ function LastFM(options){
 
 		share : function(params, session, callbacks){
 			/* Build comma separated recipients string. */
-			if(typeof(params.recipient) == 'object'){
+			if (typeof params.recipient  == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
 
@@ -817,28 +791,31 @@ function LastFM(options){
 		}
 	};
 
-	/* Private auth methods. */
 	var auth = {
-		getApiSignature : function(params){
-			var keys   = [];
+		getApiSignature: function(params){
+			console.log(params);
+			var keys = [];
 			var string = '';
 
-			for(var key in params){
-				keys.push(key);
+			for (var key in params) {
+				if (params.hasOwnProperty(key)) {
+					keys.push(key);
+				}
 			}
 
 			keys.sort();
 
-			for(var index in keys){
-				var key = keys[index];
-
-				string += key + params[key];
+			for (var index in keys) {
+				if (keys.hasOwnProperty(index)) {
+					var key = keys[index];
+					string += key + params[key];
+				}
 			}
 
 			string += apiSecret;
 
-			/* Needs lastfm.api.md5.js. */
 			return md5(string);
 		}
 	};
 }
+
