@@ -26,7 +26,8 @@ qualityChanged: false,
 lastfm: {
 	api: null,
 	apiToken: '',
-	apiSession: '',
+	sessionKey: '',
+	sessionName: '',
 	scrobbled: false,
 	scrobbleAuthenticated: false,
 	apiKey: 'a4a30dff7a34add7275a73deeb00364a',
@@ -420,9 +421,13 @@ scrobbleAuthenticate: function(){
 			apiKey    : aC.lastfm.apiKey,
 			apiSecret : aC.lastfm.apiSecret
 		});
-		// aC.lastfm.apiSession
 		aC.lastfm.api.auth.getSession({
 			token: aC.lastfm.apiToken
+		}, {
+			success: function(data){
+				aC.lastfm.sessionKey = data.session.key;
+				aC.lastfm.sessionName = data.session.name;
+			}
 		});
 	}
 },
@@ -430,20 +435,14 @@ scrobblePlaying: function(){
 	aC.lastfm.api.track.updateNowPlaying({
 		artist: aC.playlist[aC.index].artist,
 		track: aC.playlist[aC.index].track
-		//api_key: "",
-		//api_sig: "",
-		//sk: ""
-	});
+	}, aC.lastfm.sessionKey);
 },
 scrobbleTrack: function(){
 	aC.lastfm.api.track.scrobble({
 		artist: aC.playlist[aC.index].artist,
 		track: aC.playlist[aC.index].track,
 		timestamp: timestamp()
-		//api_key: "",
-		//api_sig: "",
-		//sk: ""
-	});
+	}, aC.lastfm.sessionKey);
 }
 };
 })();
