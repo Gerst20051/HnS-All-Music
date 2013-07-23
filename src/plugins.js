@@ -66,8 +66,8 @@ function getHash(){ return decodeURIComponent(window.location.hash.substring(1))
 function clearHash(){ window.location.replace("#"); }
 function setHash(hash){ window.location.replace("#" + encodeURI(hash)); }
 
-Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
-Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
+//Array.prototype.diff = function(a){ return this.filter(function(i){return!(a.indexOf(i)>-1)}); };
+//Array.prototype.random = function(){ return this[getRandomInt(0,this.length-1)]; };
 String.prototype.capitalize = function(){ return this[0].toUpperCase() + this.slice(1); };
 
 window.keys = {
@@ -100,6 +100,7 @@ window.keys = {
 	UP_ARROW2: 63232
 };
 
+/*
 tfObjSort={
 	init:function(){
 		Array.prototype.objSort=function(){
@@ -164,6 +165,7 @@ tfObjSort={
 	}
 };
 tfObjSort.init();
+*/
 
 yt={
 	ps: {

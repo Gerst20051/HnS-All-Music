@@ -1,91 +1,69 @@
 function LastFM(options){
-	/* Set default values for required options. */
 	var apiKey    = options.apiKey    || '';
 	var apiSecret = options.apiSecret || '';
 	var apiUrl    = options.apiUrl    || 'http://ws.audioscrobbler.com/2.0/';
 	var cache     = options.cache     || undefined;
 
-	/* Set API key. */
 	this.setApiKey = function(_apiKey){
 		apiKey = _apiKey;
 	};
 
-	/* Set API key. */
 	this.setApiSecret = function(_apiSecret){
 		apiSecret = _apiSecret;
 	};
 
-	/* Set API URL. */
 	this.setApiUrl = function(_apiUrl){
 		apiUrl = _apiUrl;
 	};
 
-	/* Set cache. */
 	this.setCache = function(_cache){
 		cache = _cache;
 	};
 
-	/* Internal call (POST, GET). */
 	var internalCall = function(params, callbacks, requestMethod){
-		/* Cross-domain POST request (doesn't return any data, always successful). */
-		if(requestMethod == 'POST'){
-			/* Create iframe element to post data. */
+		if (requestMethod == 'POST') {
 			var html   = document.getElementsByTagName('html')[0];
 			var iframe = document.createElement('iframe');
 			var doc;
 
-			/* Set iframe attributes. */
 			iframe.width        = 1;
 			iframe.height       = 1;
 			iframe.style.border = 'none';
 			iframe.onload       = function(){
-				/* Remove iframe element. */
 				//html.removeChild(iframe);
 
-				/* Call user callback. */
-				if (typeof(callbacks.success) != 'undefined'){
+				if (typeof callbacks.success != 'undefined') {
 					callbacks.success();
 				}
 			};
 
-			/* Append iframe. */
 			html.appendChild(iframe);
 
-			/* Get iframe document. */
-			if (typeof(iframe.contentWindow) != 'undefined'){
+			if (typeof iframe.contentWindow != 'undefined') {
 				doc = iframe.contentWindow.document;
-			} else if (typeof(iframe.contentDocument.document) != 'undefined'){
+			} else if (typeof iframe.contentDocument.document != 'undefined') {
 				doc = iframe.contentDocument.document.document;
 			} else {
 				doc = iframe.contentDocument.document;
 			}
 
-			/* Open iframe document and write a form. */
 			doc.open();
 			doc.clear();
 			doc.write('<form method="post" action="' + apiUrl + '" id="form">');
 
-			/* Write POST parameters as input fields. */
-			for(var param in params){
+			for (var param in params) {
 				doc.write('<input type="text" name="' + param + '" value="' + params[param] + '">');
 			}
 
-			/* Write automatic form submission code. */
 			doc.write('</form>');
 			doc.write('<script type="application/x-javascript">');
 			doc.write('document.getElementById("form").submit();');
 			doc.write('</script>');
-
-			/* Close iframe document. */
 			doc.close();
-		} else { /* Cross-domain GET request (JSONP). */
-			/* Get JSONP callback name. */
+		} else {
 			var jsonp = 'jsonp' + new Date().getTime();
-
-			/* Calculate cache hash. */
 			var hash = auth.getApiSignature(params);
 
-			/* Check cache. */
 			if (typeof cache != 'undefined' && cache.contains(hash) && !cache.isExpired(hash)) {
 				if (typeof callbacks.success != 'undefined') {
 					callbacks.success(cache.load(hash));
@@ -93,11 +71,9 @@ function LastFM(options){
 				return;
 			}
 
-			/* Set callback name and response format. */
 			params.callback = jsonp;
 			params.format   = 'json';
 
-			/* Create JSONP callback function. */
 			window[jsonp] = function(data){
 				if (typeof cache != 'undefined') {
 					var expiration = cache.getExpirationTime(params);
@@ -106,7 +82,6 @@ function LastFM(options){
 					}
 				}
 
-				/* Call user callback. */
 				if (typeof data.error != 'undefined') {
 					if (typeof callbacks.error != 'undefined') {
 						callbacks.error(data.error, data.message);
@@ -115,7 +90,6 @@ function LastFM(options){
 					callbacks.success(data);
 				}
 
-				/* Garbage collect. */
 				window[jsonp] = undefined;
 
 				try {
@@ -127,67 +101,46 @@ function LastFM(options){
 				}
 			};
 
-			/* Create script element to load JSON data. */
 			var head   = document.getElementsByTagName("head")[0];
 			var script = document.createElement("script");
-
-			/* Build parameter string. */
 			var array = [];
 
 			for (var param in params) {
 				array.push(encodeURIComponent(param) + "=" + encodeURIComponent(params[param]));
 			}
 
-			/* Set script source. */
 			script.src = apiUrl + '?' + array.join('&').replace(/%20/g, '+');
-
-			/* Append script element. */
 			head.appendChild(script);
 		}
 	};
 
-	/* Normal method call. */
 	var call = function(method, params, callbacks, requestMethod){
-		/* Set default values. */
 		params        = params        || {};
 		callbacks     = callbacks     || {};
 		requestMethod = requestMethod || 'GET';
-
-		/* Add parameters. */
 		params.method  = method;
 		params.api_key = apiKey;
-
-		/* Call method. */
 		internalCall(params, callbacks, requestMethod);
 	};
 
-	/* Signed method call. */
 	var signedCall = function(method, params, session, callbacks, requestMethod){
-		/* Set default values. */
 		params        = params        || {};
 		callbacks     = callbacks     || {};
 		requestMethod = requestMethod || 'GET';
 
-		/* Add parameters. */
 		params.method  = method;
 		params.api_key = apiKey;
 
-		/* Add session key. */
-		if(session && typeof(session.key) != 'undefined'){
+		if (session && typeof(session.key) != 'undefined') {
 			params.sk = session.key;
 		}
 
-		/* Get API signature. */
 		params.api_sig = auth.getApiSignature(params);
-
-		/* Call method. */
 		internalCall(params, callbacks, requestMethod);
 	};
 
-	/* Album methods. */
 	this.album = {
 		addTags : function(params, session, callbacks){
-			/* Build comma separated tags string. */
 			if (typeof params.tags == 'object') {
 				params.tags = params.tags.join(',');
 			}
@@ -216,7 +169,6 @@ function LastFM(options){
 		},
 
 		share : function(params, session, callbacks){
-			/* Build comma separated recipients string. */
 			if (typeof params.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
@@ -225,10 +177,8 @@ function LastFM(options){
 		}
 	};
 
-	/* Artist methods. */
 	this.artist = {
 		addTags : function(params, session, callbacks){
-			/* Build comma separated tags string. */
 			if (typeof params.tags == 'object') {
 				params.tags = params.tags.join(',');
 			}
@@ -297,7 +247,6 @@ function LastFM(options){
 		},
 
 		share : function(params, session, callbacks){
-			/* Build comma separated recipients string. */
 			if (typeofparams.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
@@ -310,10 +259,8 @@ function LastFM(options){
 		}
 	};
 
-	/* Auth methods. */
 	this.auth = {
 		getMobileSession : function(params, callbacks){
-			/* Set new params object with authToken. */
 			params = {
 				username  : params.username,
 				authToken : md5(params.username + md5(params.password))
@@ -330,7 +277,6 @@ function LastFM(options){
 			signedCall('auth.getToken', null, null, callbacks);
 		},
 
-		/* Deprecated. Security hole was fixed. */
 		getWebSession : function(callbacks){
 			var previuousApiUrl = apiUrl;
 			apiUrl = 'http://ext.last.fm/2.0/';
@@ -339,7 +285,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Chart methods. */
 	this.chart = {
 		getHypedArtists : function(params, session, callbacks){
 			call('chart.getHypedArtists', params, callbacks);
@@ -366,7 +311,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Event methods. */
 	this.event = {
 		attend : function(params, session, callbacks){
 			signedCall('event.attend', params, session, callbacks, 'POST');
@@ -385,7 +329,6 @@ function LastFM(options){
 		},
 
 		share : function(params, session, callbacks){
-			/* Build comma separated recipients string. */
 			if (typeof params.recipient == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
@@ -398,7 +341,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Geo methods. */
 	this.geo = {
 		getEvents : function(params, callbacks){
 			call('geo.getEvents', params, callbacks);
@@ -445,7 +387,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Group methods. */
 	this.group = {
 		getHype : function(params, callbacks){
 			call('group.getHype', params, callbacks);
@@ -472,7 +413,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Library methods. */
 	this.library = {
 		addAlbum : function(params, session, callbacks){
 			signedCall('library.addAlbum', params, session, callbacks, 'POST');
@@ -499,7 +439,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Playlist methods. */
 	this.playlist = {
 		addTrack : function(params, session, callbacks){
 			signedCall('playlist.addTrack', params, session, callbacks, 'POST');
@@ -514,7 +453,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Radio methods. */
 	this.radio = {
 		getPlaylist : function(params, session, callbacks){
 			signedCall('radio.getPlaylist', params, session, callbacks);
@@ -529,7 +467,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Tag methods. */
 	this.tag = {
 		getInfo : function(params, callbacks){
 			call('tag.getInfo', params, callbacks);
@@ -568,7 +505,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Tasteometer method. */
 	this.tasteometer = {
 		compare : function(params, callbacks){
 			call('tasteometer.compare', params, callbacks);
@@ -579,7 +515,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Track methods. */
 	this.track = {
 		addTags : function(params, session, callbacks){
 			signedCall('track.addTags', params, session, callbacks, 'POST');
@@ -652,7 +587,6 @@ function LastFM(options){
 		},
 
 		share : function(params, session, callbacks){
-			/* Build comma separated recipients string. */
 			if (typeof params.recipient  == 'object') {
 				params.recipient = params.recipient.join(',');
 			}
@@ -673,7 +607,6 @@ function LastFM(options){
 		}
 	};
 
-	/* User methods. */
 	this.user = {
 		getArtistTracks : function(params, callbacks){
 			call('user.getArtistTracks', params, callbacks);
@@ -776,7 +709,6 @@ function LastFM(options){
 		}
 	};
 
-	/* Venue methods. */
 	this.venue = {
 		getEvents : function(params, callbacks){
 			call('venue.getEvents', params, callbacks);
@@ -793,7 +725,6 @@ function LastFM(options){
 
 	var auth = {
 		getApiSignature: function(params){
-			console.log(params);
 			var keys = [];
 			var string = '';
 
