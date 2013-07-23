@@ -41,6 +41,27 @@ function getRandomInt(min,max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function timestamp(){
+	return Date.now && Date.now() || +new Date;
+}
+
+function parseQueryString(){
+	var assoc = {};
+	var keyValues = location.search.slice(1).split('&');
+	var decode = function(s){
+		return decodeURIComponent(s.replace(/\+/g, ' '));
+	};
+
+	for (var i = 0; i < keyValues.length; ++i) {
+		var key = keyValues[i].split('=');
+		if (1 < key.length) {
+			assoc[decode(key[0])] = decode(key[1]);
+		}
+	}
+
+	return assoc;
+}
+
 function getHash(){ return decodeURIComponent(window.location.hash.substring(1)); }
 function clearHash(){ window.location.replace("#"); }
 function setHash(hash){ window.location.replace("#" + encodeURI(hash)); }

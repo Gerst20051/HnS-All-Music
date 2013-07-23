@@ -1,5 +1,6 @@
 (function(){
 aC = {
+query: {},
 playerHeight: 506,
 newPlayerHeight: 0,
 playerWidth: 900,
@@ -18,18 +19,29 @@ starttimeFocus: false,
 playtimeFocus: false,
 resizeTO: null,
 expressTO: null,
+scrobbleTO: null,
 seekerInterval: null,
 durationInterval: null,
 qualityChanged: false,
+lastfm: {
+	api: null,
+	apiToken: '',
+	apiSession: '',
+	scrobbled: false,
+	scrobbleAuthenticated: false,
+	apiKey: 'a4a30dff7a34add7275a73deeb00364a',
+	apiSecret: 'c1b632f0169f95381c9002d7a0d6575c'
+},
 settings: {
 	random: true,
 	express: true,
 	autostart: true,
-	order: "artist",
+	quality: "small",
 	starttime: 30,
 	playtime: 90,
-	quality: "small",
-	repeat: false
+	sort: "artist",
+	repeat: false,
+	scrobble: false
 },
 searchPlaylist: function(a,b){
 	var retArr = [], search = a.split(' ');
@@ -259,6 +271,10 @@ triggerPlayPause: function(i){
 			else yt.seekTo(0);
 		}
 		setHash(pid);
+		if (aC.settings.scrobble === true && aC.lastfm.scrobbled === false) {
+			aC.lastfm.scrobbled = true;
+			aC.scrobbleTO = setTimeout("aC.scrobbleTrack()", 1E3*15);
+		}
 	}
 	aC.index = a;
 	aC.handleTrack();
@@ -267,6 +283,9 @@ goPrevVideo: function(){
 	if (1 < aC.history.length && 0 < aC.historyPos) aC.triggerPlayPause(aC.history[aC.historyPos--],true);
 },
 goNextVideo: function(){
+	aC.lastfm.scrobbled = false;
+	aC.scrobblePlaying();
+	if (aC.scrobbleTO !== null) clearTimeout(aC.scrobbleTO), aC.scrobbleTO = null;
 	if (aC.settings.repeat === false || arguments.length == 1) {
 		var plength = aC.playlistLength;
 		if (0 < aC.searchLength) plength = aC.searchLength;
@@ -391,6 +410,40 @@ doSearch: function(){
 		$("#sresultcount").empty();
 		aC.loadPlaylist(aC.playlist);
 	}
+},
+scrobbleAuthenticate: function(){
+	if (!aC.query.token) {
+		window.location = "http://www.last.fm/api/auth?api_key="+aC.lastfm.apiKey+"&cb="+document.URL;
+	} else {
+		aC.lastfm.apiToken = aC.query.token;
+		aC.lastfm.api = new LastFM({
+			apiKey    : aC.lastfm.apiKey,
+			apiSecret : aC.lastfm.apiSecret
+		});
+		// aC.lastfm.apiSession
+		aC.lastfm.api.auth.getSession({
+			token: aC.lastfm.apiToken
+		});
+	}
+},
+scrobblePlaying: function(){
+	aC.lastfm.api.track.updateNowPlaying({
+		artist: aC.playlist[aC.index].artist,
+		track: aC.playlist[aC.index].track
+		//api_key: "",
+		//api_sig: "",
+		//sk: ""
+	});
+},
+scrobbleTrack: function(){
+	aC.lastfm.api.track.scrobble({
+		artist: aC.playlist[aC.index].artist,
+		track: aC.playlist[aC.index].track,
+		timestamp: timestamp()
+		//api_key: "",
+		//api_sig: "",
+		//sk: ""
+	});
 }
 };
 })();
@@ -542,6 +595,10 @@ function onYouTubePlayerReady(a){
 	$("#vD").center("fixed").addClass('hide').css('visibility','visible');
 	aC.checkPlaylist();
 	aC.checkHash();
+	aC.query = parseQueryString();
+	if (aC.settings.scrobble === true) {
+		aC.scrobbleAuthenticate();
+	}
 }
 
 function onPlayerStateChange(a){
