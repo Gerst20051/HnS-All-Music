@@ -20,6 +20,7 @@ playtimeFocus: false,
 resizeTO: null,
 expressTO: null,
 scrobbleTO: null,
+scrobblePlayingTO: null,
 seekerInterval: null,
 durationInterval: null,
 qualityChanged: false,
@@ -166,6 +167,9 @@ setPlayerDimensions: function(){
 		$("#vD").center("fixed");
 	}
 },
+loadQueryString: function(){
+	aC.query = parseQueryString();
+},
 loadSettings: function(){
 	if (sls()) {
 		var settings = localStorage.getItem('settings');
@@ -177,6 +181,9 @@ loadSettings: function(){
 				else if (Object.toType(aC.settings[id]) === "string") $("#"+id+" .on").text(aC.settings[id].capitalize());
 				else if (Object.toType(aC.settings[id]) === "number") $("#"+id+" .on").text(aC.settings[id]);
 			}
+			if (aC.settings.scrobble === true) {
+				aC.scrobbleAuthenticate();
+			}
 		}
 	}
 },
@@ -187,6 +194,13 @@ showNotification: function(a){
 hideNotification: function(){
 	$("#notifBar").animate({top: -80}, "fast");
 	$("#notifBar #message").empty();
+},
+handleScrobbling: function(){
+	if (aC.settings.scrobble === true && aC.lastfm.scrobbled === false) {
+		aC.lastfm.scrobbled = true;
+		aC.scrobblePlayingTO = setTimeout("aC.scrobblePlaying()", 1E3*5);
+		aC.scrobbleTO = setTimeout("aC.scrobbleTrack()", 1E3*30);
+	}
 },
 handleTrack: function(newSeekerWidth){
 	if (aC.seekerInterval !== null) clearInterval(aC.seekerInterval), aC.seekerInterval = null;
@@ -272,20 +286,17 @@ triggerPlayPause: function(i){
 			else yt.seekTo(0);
 		}
 		setHash(pid);
-		if (aC.settings.scrobble === true && aC.lastfm.scrobbled === false) {
-			aC.lastfm.scrobbled = true;
-			aC.scrobbleTO = setTimeout("aC.scrobbleTrack()", 1E3*15);
-		}
 	}
 	aC.index = a;
 	aC.handleTrack();
+	aC.handleScrobbling();
 },
 goPrevVideo: function(){
 	if (1 < aC.history.length && 0 < aC.historyPos) aC.triggerPlayPause(aC.history[aC.historyPos--],true);
 },
 goNextVideo: function(){
 	aC.lastfm.scrobbled = false;
-	aC.scrobblePlaying();
+	if (aC.scrobblePlayingTO !== null) clearTimeout(aC.scrobblePlayingTO), aC.scrobblePlayingTO = null;
 	if (aC.scrobbleTO !== null) clearTimeout(aC.scrobbleTO), aC.scrobbleTO = null;
 	if (aC.settings.repeat === false || arguments.length == 1) {
 		var plength = aC.playlistLength;
@@ -421,28 +432,34 @@ scrobbleAuthenticate: function(){
 			apiKey    : aC.lastfm.apiKey,
 			apiSecret : aC.lastfm.apiSecret
 		});
-		aC.lastfm.api.auth.getSession({
-			token: aC.lastfm.apiToken
-		}, {
-			success: function(data){
-				aC.lastfm.sessionKey = data.session.key;
-				aC.lastfm.sessionName = data.session.name;
-			}
-		});
+		try {
+			aC.lastfm.api.auth.getSession({
+				token: aC.lastfm.apiToken
+			}, {
+				success: function(data){
+					aC.lastfm.sessionKey = data.session.key;
+					aC.lastfm.sessionName = data.session.name;
+				}
+			});
+		} catch(e) {}
 	}
 },
 scrobblePlaying: function(){
-	aC.lastfm.api.track.updateNowPlaying({
-		artist: aC.playlist[aC.index].artist,
-		track: aC.playlist[aC.index].track
-	}, aC.lastfm.sessionKey);
+	try {
+		aC.lastfm.api.track.updateNowPlaying({
+			artist: aC.playlist[aC.index].artist,
+			track: aC.playlist[aC.index].track
+		}, { key: aC.lastfm.sessionKey });
+	} catch(e) {}
 },
 scrobbleTrack: function(){
-	aC.lastfm.api.track.scrobble({
-		artist: aC.playlist[aC.index].artist,
-		track: aC.playlist[aC.index].track,
-		timestamp: timestamp()
-	}, aC.lastfm.sessionKey);
+	try {
+		aC.lastfm.api.track.scrobble({
+			artist: aC.playlist[aC.index].artist,
+			track: aC.playlist[aC.index].track,
+			timestamp: timestamp_sec()
+		}, { key: aC.lastfm.sessionKey });
+	} catch(e) {}
 }
 };
 })();
@@ -453,6 +470,7 @@ $(window).resize(function(){
 });
 
 $(document).ready(function(){
+	aC.loadQueryString();
 	aC.setDimensions();
 	aC.loadSettings();
 	$("#sB").on('focus',function(){
@@ -594,10 +612,6 @@ function onYouTubePlayerReady(a){
 	$("#vD").center("fixed").addClass('hide').css('visibility','visible');
 	aC.checkPlaylist();
 	aC.checkHash();
-	aC.query = parseQueryString();
-	if (aC.settings.scrobble === true) {
-		aC.scrobbleAuthenticate();
-	}
 }
 
 function onPlayerStateChange(a){

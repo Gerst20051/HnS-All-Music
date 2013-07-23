@@ -41,8 +41,8 @@ function getRandomInt(min,max){
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function timestamp(){
-	return Date.now && Date.now() || +new Date;
+function timestamp_sec(){
+	return Date.now && Math.floor(Date.now() / 1E3) || Math.floor(+new Date / 1E3);
 }
 
 function parseQueryString(){
