@@ -31,7 +31,6 @@ function LastFM(options){
 			iframe.style.border = 'none';
 			iframe.onload       = function(){
 				//html.removeChild(iframe);
-
 				if (typeof callbacks.success != 'undefined') {
 					callbacks.success();
 				}
@@ -103,7 +102,7 @@ function LastFM(options){
 
 			var head   = document.getElementsByTagName("head")[0];
 			var script = document.createElement("script");
-			var array = [];
+			var array  = [];
 
 			for (var param in params) {
 				array.push(encodeURIComponent(param) + "=" + encodeURIComponent(params[param]));
@@ -115,23 +114,22 @@ function LastFM(options){
 	};
 
 	var call = function(method, params, callbacks, requestMethod){
-		params        = params        || {};
-		callbacks     = callbacks     || {};
-		requestMethod = requestMethod || 'GET';
+		params         = params        || {};
+		callbacks      = callbacks     || {};
+		requestMethod  = requestMethod || 'GET';
 		params.method  = method;
 		params.api_key = apiKey;
 		internalCall(params, callbacks, requestMethod);
 	};
 
 	var signedCall = function(method, params, session, callbacks, requestMethod){
-		params        = params        || {};
-		callbacks     = callbacks     || {};
-		requestMethod = requestMethod || 'GET';
-
+		params         = params        || {};
+		callbacks      = callbacks     || {};
+		requestMethod  = requestMethod || 'GET';
 		params.method  = method;
 		params.api_key = apiKey;
 
-		if (session && typeof(session.key) != 'undefined') {
+		if (session && typeof session.key != 'undefined') {
 			params.sk = session.key;
 		}
 
