@@ -32,7 +32,9 @@ lastfm: {
 	scrobbled: false,
 	scrobbleAuthenticated: false,
 	apiKey: 'a4a30dff7a34add7275a73deeb00364a',
-	apiSecret: 'c1b632f0169f95381c9002d7a0d6575c'
+	apiSecret: 'c1b632f0169f95381c9002d7a0d6575c',
+	scrobblePlayingDelay: 5,
+	scrobbleDelay: 45
 },
 settings: {
 	random: true,
@@ -201,8 +203,8 @@ hideNotification: function(){
 handleScrobbling: function(){
 	if (aC.settings.scrobble === true && aC.lastfm.scrobbled === false) {
 		aC.lastfm.scrobbled = true;
-		aC.scrobblePlayingTO = setTimeout("aC.scrobblePlaying()", 1E3*5);
-		aC.scrobbleTO = setTimeout("aC.scrobbleTrack()", 1E3*30);
+		aC.scrobblePlayingTO = setTimeout("aC.scrobblePlaying()", aC.lastfm.scrobblePlayingDelay*1E3);
+		aC.scrobbleTO = setTimeout("aC.scrobbleTrack()", aC.lastfm.scrobbleDelay*1E3);
 	}
 },
 handleTrack: function(newSeekerWidth){
@@ -503,7 +505,7 @@ $(document).ready(function(){
 		if (sls()) localStorage['settings'] = JSON.stringify(aC.settings);
 		if (id == "express") {
 			if (aC.settings.express === true) {
-				aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3-yt.getCurrentTime()*1E3);
+				aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3);
 			} else {
 				if (aC.expressTO !== null) clearTimeout(aC.expressTO), aC.expressTO = null;
 			}
