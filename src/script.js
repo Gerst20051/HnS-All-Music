@@ -45,6 +45,9 @@ settings: {
 	repeat: false,
 	scrobble: false
 },
+getVideoImage: function(id){
+	return 'http://i.ytimg.com/vi/' + id + '/default.jpg';
+},
 searchPlaylist: function(a,b){
 	var retArr = [], search = a.split(' ');
 	$.each(b, function(i,v){
@@ -110,7 +113,7 @@ checkHash: function(){
 	if (1 < hash.length) {
 		for (var index in aC.playlist) {
 			if (aC.playlist[index].id == hash) {
-				aC.triggerPlayPause(parseInt(index));
+				aC.triggerPlayPause(+index);
 				$('.player .meta .track-name').click();
 				setTimeout("$('.player .list').click()",1000);
 				setTimeout("$('#widgetContainer').animate({opacity:1})",1500);
@@ -247,7 +250,7 @@ triggerPlayPause: function(i){
 			player.removeClass("off").addClass("on");
 			$("#content").find(".i").eq(i).removeClass("off").addClass("on");
 			yt.playVideo();
-			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3-yt.getCurrentTime()*1E3);
+			if (aC.settings.express === true) aC.expressTO = setTimeout("aC.goNextVideo()",aC.settings.playtime*1E3);
 		}
 	} else {
 		if (arguments.length == 1) {
